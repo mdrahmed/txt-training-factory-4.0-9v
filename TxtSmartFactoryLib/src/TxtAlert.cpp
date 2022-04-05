@@ -19,16 +19,19 @@ TxtFlapping::TxtFlapping()
 	  rawtimeLastChange(0)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "");
+	spdlog::get("file_logger")->trace("");
 }
 
 TxtFlapping::~TxtFlapping()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "");
+	spdlog::get("file_logger")->trace("");
 }
 
 void TxtFlapping::UpdateFlappingStatus(bool stateChange)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "{}",stateChange);
+	spdlog::get("file_logger")->trace("{}",stateChange);
 
 	int oldestIndex = this->flappingIndex;
 

@@ -83,6 +83,7 @@ std::chrono::system_clock::time_point startLast;
 
 void setLED(int o, int v) {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "setLED o:{} v:{}", o, v);
+	spdlog::get("file_logger")->trace("setLED o:{} v:{}", o, v);
 	if (pTArea) {
 		pTArea->ftX1out.duty[o] = v;
 	}
@@ -94,11 +95,13 @@ public:
 	TxtJoystickButtonsObserver(ft::TxtJoystickXYBController* s)
 	{
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtJoystickButtonsObserver",0);
+		spdlog::get("file_logger")->trace("TxtJoystickButtonsObserver",0);
 		_subject = s;
 		_subject->Attach(this);
 	}
 	virtual ~TxtJoystickButtonsObserver() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtJoystickButtonsObserver",0);
+		spdlog::get("file_logger")->trace("~TxtJoystickButtonsObserver",0);
 		_subject->Detach(this);
 	}
 	void Update(ft::SubjectObserver* theChangedSubject) {
@@ -121,11 +124,13 @@ public:
 	TxtPTUPosObserver(ft::TxtPanTiltUnit* s)
 	{
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtPTUPosObserver",0);
+		spdlog::get("file_logger")->trace("TxtPTUPosObserver",0);
 		_subject = s;
 		_subject->Attach(this);
 	}
 	virtual ~TxtPTUPosObserver() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtPTUPosObserver",0);
+		spdlog::get("file_logger")->trace("~TxtPTUPosObserver",0);
 		_subject->Detach(this);
 	}
 	void Update(ft::SubjectObserver* theChangedSubject) {
@@ -148,11 +153,13 @@ public:
 	TxtCameraObserver(ft::TxtCamera* s)
 	{
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtCameraObserver",0);
+		spdlog::get("file_logger")->trace("TxtCameraObserver",0);
 		_subject = s;
 		_subject->Attach(this);
 	}
 	virtual ~TxtCameraObserver() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtCameraObserver",0);
+		spdlog::get("file_logger")->trace("~TxtCameraObserver",0);
 		_subject->Detach(this);
 	}
 	void Update(ft::SubjectObserver* theChangedSubject) {
@@ -166,6 +173,7 @@ public:
 			if (!sdata.empty()) {
 #ifdef CAM_TEST
 					spdlog::get("console")->info("CAM 3: --- publish");
+					spdlog::get("file_logger")->info("CAM 3: --- publish");
 #endif
 				assert(pcli);
 				long timeout_ms = TIMEOUT_CONNECTION_MS;//TODO _subject->getPeriod(); //67 max 15fps
@@ -199,11 +207,13 @@ public:
 	TxtMotionDetectionObserver(ft::TxtMotionDetection* s)
 	{
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtMotionDetectionObserver",0);
+		spdlog::get("file_logger")->trace("TxtMotionDetectionObserver",0);
 		_subject = s;
 		_subject->Attach(this);
 	}
 	virtual ~TxtMotionDetectionObserver() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtMotionDetectionObserver",0);
+		spdlog::get("file_logger")->trace("~TxtMotionDetectionObserver",0);
 		_subject->Detach(this);
 	}
 	void Update(ft::SubjectObserver* theChangedSubject) {
@@ -231,6 +241,7 @@ public:
 	TxtBme680Observer(ft::TxtBME680* s)
 	{
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtBme680Observer",0);
+		spdlog::get("file_logger")->trace("TxtBme680Observer",0);
 		_subject = s;
 		_subject->Attach(this);
 	}
@@ -244,6 +255,7 @@ public:
 			//BME680
 			double diff = ((_subject->_timestamp - timestamp_bme680) / 1000000000.) + delta;
 			spdlog::get("console")->info("BME680 diff:{}", diff);
+			spdlog::get("file_logger")->info("BME680 diff:{}", diff);
 			if ((timestamp_bme680 == 0) || (diff >= period_bme680)) {
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "timestamp_bme680:{} period_bme680:{}", timestamp_bme680/1000000000., period_bme680);
 				timestamp_bme680 = _subject->_timestamp;
@@ -273,16 +285,19 @@ public:
 	TxtAlertBme680Observer(ft::TxtBME680* s)
 	{
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtBme680Observer",0);
+		spdlog::get("file_logger")->trace("TxtBme680Observer",0);
 		_subject = s;
 		_subject->Attach(this);
 	}
 	virtual ~TxtAlertBme680Observer() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtBme680Observer",0);
+		spdlog::get("file_logger")->trace("~TxtBme680Observer",0);
 		_subject->Detach(this);
 	}
 	void Update(ft::SubjectObserver* theChangedSubject) {
 		if(theChangedSubject == _subject) {
-			SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtAlertBme680Observer Update",0);
+			SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtAlertBme680Observer Update",0);		
+			spdlog::get("file_logger")->trace("TxtAlertBme680Observer Update",0);
 			//_subject->_timestamp
 			long int timeout_ms = TIMEOUT_CONNECTION_MS;//TODO 1000;
 			if (_subject->_temperature < 4.0) {
@@ -290,6 +305,7 @@ public:
 				auto dur = tsDetected-tsLastDetectedTemp;
 				auto secs = std::chrono::duration_cast< std::chrono::duration<float> >(dur);
 				SPDLOG_LOGGER_TRACE(spdlog::get("console"), "elapsed_seconds {}", secs.count());
+				spdlog::get("file_logger")->trace("elapsed_seconds {}", secs.count());
 				if (secs.count() > TIMEWAIT_S_MAX) {
 					tsLastDetectedTemp = tsDetected;
 					assert(pcli);
@@ -302,6 +318,7 @@ public:
 				auto dur = tsDetected-tsLastDetectedHum;
 				auto secs = std::chrono::duration_cast< std::chrono::duration<float> >(dur);
 				SPDLOG_LOGGER_TRACE(spdlog::get("console"), "elapsed_seconds {}", secs.count());
+				spdlog::get("file_logger")->trace("elapsed_seconds {}", secs.count());
 				if (secs.count() > TIMEWAIT_S_MAX) {
 					tsLastDetectedHum = tsDetected;
 					assert(pcli);
@@ -310,6 +327,7 @@ public:
 				}
 			}
 			SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtAlertBme680Observer Update",0);
+			spdlog::get("file_logger")->trace("TxtAlertBme680Observer Update",0);
 		}
 	}
 private:
@@ -329,6 +347,7 @@ class callback : public virtual mqtt::callback
 
 	void connected(const std::string& cause) override {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "connected: {}", cause);
+		spdlog::get("file_logger")->trace("connected: {}", cause);
 		long timeout_ms = TIMEOUT_CONNECTION_MS;
 		std::cout << "Subscribe MQTTClient" << std::endl;
 		pcli->start_consume(timeout_ms);
@@ -339,6 +358,7 @@ class callback : public virtual mqtt::callback
 	// This will initiate the attempt to manually reconnect.
 	void connection_lost(const std::string& cause) override {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "connection_lost: {}", cause);
+		spdlog::get("file_logger")->trace("connection_lost: {}", cause);
 	}
 
 	// Callback for when a message arrives.
@@ -436,6 +456,7 @@ class callback : public virtual mqtt::callback
 					} else if (period >= 1.0) {
 						period_bme680 = 3.0;
 						spdlog::get("console")->warn("WRONG CONFIG: period should be >= 3.0. Setting period_bme680=3.0s",0);
+						spdlog::get("file_logger")->warn("WRONG CONFIG: period should be >= 3.0. Setting period_bme680=3.0s",0);
 					}
 				} catch (const Json::RuntimeError& exc) {
 					std::cout << "Error: " << exc.what() << std::endl;
@@ -460,6 +481,7 @@ class callback : public virtual mqtt::callback
 						SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "Setting period_ldr={}s",period_ldr);
 					} else {
 						spdlog::get("console")->warn("WRONG CONFIG: period >= 1.0. Setting period_ldr=1.0s",0);
+						spdlog::get("file_logger")->warn("WRONG CONFIG: period >= 1.0. Setting period_ldr=1.0s",0);
 					}
 				} catch (const Json::RuntimeError& exc) {
 					std::cout << "Error: " << exc.what() << std::endl;
@@ -566,6 +588,7 @@ class callback : public virtual mqtt::callback
 	void updateLEDs(mqtt::const_message_ptr msg, const std::string station)
 	{
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "updateLEDs",0);
+		spdlog::get("file_logger")->trace("updateLEDs",0);
 		std::stringstream ssin(msg->to_string());
 		Json::Value root;
 		try {
@@ -638,8 +661,10 @@ class callback : public virtual mqtt::callback
 	void delivery_complete(mqtt::delivery_token_ptr token) override {
 		if (token) {
 			SPDLOG_LOGGER_TRACE(spdlog::get("console"), "delivery_complete: {}: {}", token->get_message_id(), token->get_message()->get_topic());
+			spdlog::get("file_logger")->trace("delivery_complete: {}: {}", token->get_message_id(), token->get_message()->get_topic());
 		} else {
 			SPDLOG_LOGGER_TRACE(spdlog::get("console"), "delivery token is NULL",0);
+			spdlog::get("file_logger")->trace("delivery token is NULL",0);
 		}
 	}
 

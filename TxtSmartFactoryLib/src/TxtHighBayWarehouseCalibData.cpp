@@ -21,6 +21,7 @@ namespace ft {
 bool TxtHighBayWarehouseCalibData::load()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "loadCalib",0);
+	spdlog::get("file_logger")->trace("loadCalib",0);
     std::ifstream infile(filename.c_str());
     if ( infile.good())
     {
@@ -73,6 +74,7 @@ bool TxtHighBayWarehouseCalibData::load()
 bool TxtHighBayWarehouseCalibData::saveDefault()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "saveDefault",0);
+	spdlog::get("file_logger")->trace("saveDefault",0);
 
 	hbx[0] = 780;
 	hbx[1] = 1390;
@@ -90,6 +92,7 @@ bool TxtHighBayWarehouseCalibData::saveDefault()
 bool TxtHighBayWarehouseCalibData::save()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "save",0);
+	spdlog::get("file_logger")->trace("save",0);
 	Json::Value event;
 
 	event["HBW"]["hbx"]["1"] = hbx[0];
@@ -110,6 +113,7 @@ bool TxtHighBayWarehouseCalibData::save()
     if(!outputFileStream.is_open())
 	{
     	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "filename {} is not opened!",filename.c_str());
+	spdlog::get("file_logger")->trace("filename {} is not opened!",filename.c_str());
     	return false;
 	}
     return (writer->write(event, &outputFileStream) == 0);

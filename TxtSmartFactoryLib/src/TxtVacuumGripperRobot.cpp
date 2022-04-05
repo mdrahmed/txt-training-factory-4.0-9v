@@ -32,6 +32,7 @@ TxtVacuumGripperRobot::TxtVacuumGripperRobot(TxtTransfer* pT, ft::TxtMqttFactory
 	obs_vgr(0), obs_nfc(0)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtVacuumGripperRobot",0);
+	spdlog::get("file_logger")->trace("TxtVacuumGripperRobot",0);
 	if (!calibData.existCalibFilename()) calibData.saveDefault();
 	calibData.load();
     configInputs();
@@ -42,6 +43,7 @@ TxtVacuumGripperRobot::TxtVacuumGripperRobot(TxtTransfer* pT, ft::TxtMqttFactory
 TxtVacuumGripperRobot::~TxtVacuumGripperRobot()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtVacuumGripperRobot",0);
+	spdlog::get("file_logger")->trace("~TxtVacuumGripperRobot",0);
 	delete obs_vgr;
 	delete obs_nfc;
 }
@@ -49,6 +51,7 @@ TxtVacuumGripperRobot::~TxtVacuumGripperRobot()
 void TxtVacuumGripperRobot::stop()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "stop",0);
+	spdlog::get("file_logger")->trace("stop",0);
 	axisX.stop();
 	axisY.stop();
 	axisZ.stop();
@@ -57,6 +60,7 @@ void TxtVacuumGripperRobot::stop()
 void TxtVacuumGripperRobot::moveRef()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveRef",0);
+	spdlog::get("file_logger")->trace("moveRef",0);
 	setActStatus(true, SM_BUSY);
 	axisY.moveRef();
 	std::thread tx = axisX.moveRefThread();
@@ -69,42 +73,49 @@ void TxtVacuumGripperRobot::moveRef()
 void TxtVacuumGripperRobot::moveXRef()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveXRef",0);
+	spdlog::get("file_logger")->trace("moveXRef",0);
 	axisX.moveRef();
 }
 
 void TxtVacuumGripperRobot::moveYRef()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveYRef",0);
+	spdlog::get("file_logger")->trace("moveYRef",0);
 	axisY.moveRef();
 }
 
 void TxtVacuumGripperRobot::moveZRef()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveZRef",0);
+	spdlog::get("file_logger")->trace("moveZRef",0);
 	axisZ.moveRef();
 }
 
 void TxtVacuumGripperRobot::moveXEnd()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveXEnd",0);
+	spdlog::get("file_logger")->trace("moveXEnd",0);
 	axisX.moveAbs(axisX.getPosEnd());
 }
 
 void TxtVacuumGripperRobot::moveYEnd()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveYEnd",0);
+	spdlog::get("file_logger")->trace("moveYEnd",0);
 	axisY.moveAbs(axisY.getPosEnd());
 }
 
 void TxtVacuumGripperRobot::moveZEnd()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveZEnd",0);
+	spdlog::get("file_logger")->trace("moveZEnd",0);
 	axisZ.moveAbs(axisZ.getPosEnd());
 }
 
 void TxtVacuumGripperRobot::move(const std::string pos3name, TxtVgrPosOrder_t order)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "move pos:{} o:{}",pos3name,(int)order);
+	spdlog::get("file_logger")->trace("move pos:{} o:{}",pos3name,(int)order);
 	setActStatus(true, SM_BUSY);
 	std::map<std::string, EncPos3>::iterator it;
 	it = calibData.map_pos3.find(pos3name);
@@ -121,6 +132,7 @@ void TxtVacuumGripperRobot::move(const std::string pos3name, TxtVgrPosOrder_t or
 void TxtVacuumGripperRobot::move(uint16_t x, uint16_t y, uint16_t z, TxtVgrPosOrder_t order)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "move x:{} y:{} z:{} o:{}",x,y,z,(int)order);
+	spdlog::get("file_logger")->trace("move x:{} y:{} z:{} o:{}",x,y,z,(int)order);
 	switch(order)
 	{
 	case VGRMOV_PTP:
@@ -201,6 +213,7 @@ void TxtVacuumGripperRobot::moveJoystick()
 	{
 		TxtJoysticksData jd = joyData;
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveJoystick 1:{} {} {} 2:{} {} {}", jd.aX1,jd.aY1,jd.b1,jd.aX2,jd.aY2,jd.b2);
+		spdlog::get("file_logger")->trace("moveJoystick 1:{} {} {} 2:{} {} {}", jd.aX1,jd.aY1,jd.b1,jd.aX2,jd.aY2,jd.b2);
 
 		int abs_X1 = abs(jd.aX1);
 		int abs_Y1 = abs(jd.aY1);
@@ -269,6 +282,7 @@ void TxtVacuumGripperRobot::moveJoystick()
 void TxtVacuumGripperRobot::moveDeliveryInAndGrip()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveDeliveryInAndGrip", 0);
+	spdlog::get("file_logger")->trace("moveDeliveryInAndGrip", 0);
 	move("DIN0", ft::VGRMOV_PTP);
 	move("DIN", ft::VGRMOV_PTP);
 	vgripper.grip();
@@ -278,6 +292,7 @@ void TxtVacuumGripperRobot::moveDeliveryInAndGrip()
 void TxtVacuumGripperRobot::moveDeliveryOutAndRelease()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveDeliveryOutAndRelease", 0);
+	spdlog::get("file_logger")->trace("moveDeliveryOutAndRelease", 0);
 	axisY.moveRef();
 	move("DOUT0", ft::VGRMOV_PTP);
 	move("DOUT", ft::VGRMOV_PTP);
@@ -288,6 +303,7 @@ void TxtVacuumGripperRobot::moveDeliveryOutAndRelease()
 void TxtVacuumGripperRobot::moveColorSensor(bool half)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveColorSensor", 0);
+	spdlog::get("file_logger")->trace("moveColorSensor", 0);
 	move("DCS0", ft::VGRMOV_PTP);
 	if (!half) {
 		move("DCS", ft::VGRMOV_PTP);
@@ -297,6 +313,7 @@ void TxtVacuumGripperRobot::moveColorSensor(bool half)
 void TxtVacuumGripperRobot::moveRefYNFC()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveRefNFC", 0);
+	spdlog::get("file_logger")->trace("moveRefNFC", 0);
 	axisY.moveRef();
 	move("DNFC0", ft::VGRMOV_PTP);
 	move("DNFC", ft::VGRMOV_PTP);
@@ -305,6 +322,7 @@ void TxtVacuumGripperRobot::moveRefYNFC()
 void TxtVacuumGripperRobot::moveNFC()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveNFC", 0);
+	spdlog::get("file_logger")->trace("moveNFC", 0);
 	move("DNFC0", ft::VGRMOV_PTP);
 	move("DNFC", ft::VGRMOV_PTP);
 }
@@ -312,6 +330,7 @@ void TxtVacuumGripperRobot::moveNFC()
 void TxtVacuumGripperRobot::moveWrongRelease()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveWrongRelease", 0);
+	spdlog::get("file_logger")->trace("moveWrongRelease", 0);
 	move("WDC0", ft::VGRMOV_PTP);
 	move("WDC", ft::VGRMOV_PTP);
 	vgripper.release();
@@ -322,6 +341,7 @@ void TxtVacuumGripperRobot::moveWrongRelease()
 void TxtVacuumGripperRobot::moveToHBW()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveToHBW",0);
+	spdlog::get("file_logger")->trace("moveToHBW", 0);
 	move("HBW0", ft::VGRMOV_PTP);
 	move("HBW", ft::VGRMOV_PTP);
 }
@@ -329,6 +349,7 @@ void TxtVacuumGripperRobot::moveToHBW()
 void TxtVacuumGripperRobot::moveFromHBW1()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveFromHBW1",0);
+	spdlog::get("file_logger")->trace("moveFromHBW1", 0);
 	move("HBW0", ft::VGRMOV_PTP);
 	move("HBW", ft::VGRMOV_PTP);
 }
@@ -336,6 +357,7 @@ void TxtVacuumGripperRobot::moveFromHBW1()
 void TxtVacuumGripperRobot::moveFromHBW2()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveFromHBW2",0);
+	spdlog::get("file_logger")->trace("moveFromHBW2", 0);
 	move("HBW1", ft::VGRMOV_PTP);
 	grip();
 	move("HBW", ft::VGRMOV_PTP);
@@ -345,6 +367,7 @@ void TxtVacuumGripperRobot::moveFromHBW2()
 void TxtVacuumGripperRobot::moveMPO()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveMPO",0);
+	spdlog::get("file_logger")->trace("moveMPO", 0);
 	move("MPO0", ft::VGRMOV_PTP);
 	move("MPO", ft::VGRMOV_PTP);
 	vgripper.release();
@@ -356,6 +379,7 @@ void TxtVacuumGripperRobot::moveMPO()
 void TxtVacuumGripperRobot::moveSSD1()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveSSD1",0);
+	spdlog::get("file_logger")->trace("moveSSD1", 0);
 	move("SSD10", ft::VGRMOV_PTP);
 	move("SSD1", ft::VGRMOV_PTP);
 }
@@ -363,6 +387,7 @@ void TxtVacuumGripperRobot::moveSSD1()
 void TxtVacuumGripperRobot::moveSSD2()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveSSD2",0);
+	spdlog::get("file_logger")->trace("moveSSD2", 0);
 	move("SSD20", ft::VGRMOV_PTP);
 	move("SSD2", ft::VGRMOV_PTP);
 }
@@ -370,6 +395,7 @@ void TxtVacuumGripperRobot::moveSSD2()
 void TxtVacuumGripperRobot::moveSSD3()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveSSD3",0);
+	spdlog::get("file_logger")->trace("moveSSD3", 0);
 	move("SSD30", ft::VGRMOV_PTP);
 	move("SSD3", ft::VGRMOV_PTP);
 }
@@ -377,6 +403,7 @@ void TxtVacuumGripperRobot::moveSSD3()
 void TxtVacuumGripperRobot::setSpeed(int16_t s)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "setSpeed {}", s);
+	spdlog::get("file_logger")->trace("setSpeed {}", s);
 	axisX.setSpeed(s);
 	axisY.setSpeed(s);
 	axisZ.setSpeed(s);
@@ -385,6 +412,7 @@ void TxtVacuumGripperRobot::setSpeed(int16_t s)
 void TxtVacuumGripperRobot::configInputs()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "configInputs", 0);
+	spdlog::get("file_logger")->trace("configInputs", 0);
 	assert(pT->pTArea);
 	//SSD_1
 	pT->pTArea->ftX1config.uni[3].mode = MODE_R; // Digital Switch with PullUp resistor

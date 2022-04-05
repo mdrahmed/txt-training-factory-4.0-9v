@@ -66,6 +66,7 @@ class callback : public virtual mqtt::callback
 
 	void connected(const std::string& cause) override {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "connected: {}", cause);
+		spdlog::get("file_logger")->trace("connected: {}", cause);
 		long timeout_ms = TIMEOUT_CONNECTION_MS;
 		std::cout << "Subscribe MQTTClient" << std::endl;
 		assert(pcli);
@@ -77,6 +78,7 @@ class callback : public virtual mqtt::callback
 	// This will initiate the attempt to manually reconnect.
 	void connection_lost(const std::string& cause) override {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "connection_lost: {}", cause);
+		spdlog::get("file_logger")->trace("connection_lost: {}", cause);
 	}
 
 	// Callback for when a message arrives.
@@ -661,8 +663,10 @@ class callback : public virtual mqtt::callback
 	void delivery_complete(mqtt::delivery_token_ptr token) override {
 		if (token) {
 			SPDLOG_LOGGER_TRACE(spdlog::get("console"), "delivery_complete: {}: {}", token->get_message_id(), token->get_message()->get_topic());
+			spdlog::get("file_logger")->trace("delivery_complete: {}: {}", token->get_message_id(), token->get_message()->get_topic());
 		} else {
 			SPDLOG_LOGGER_TRACE(spdlog::get("console"), "delivery token is NULL",0);
+			spdlog::get("file_logger")->trace("delivery token is NULL",0);
 		}
 	}
 
@@ -711,6 +715,9 @@ int main(int argc, char* argv[])
 		auto file_logger = spdlog::basic_logger_mt<spdlog::async_factory>("file_logger", "Data/"+clientName+".log", true);
 		spdlog::get("file_logger")->set_level(spdlog::level::trace);
 		spdlog::get("file_logger")->info("{} {}", clientName.c_str(), TxtAppVer);
+		spdlog::get("file_logger")->info("adding new lgos {} {}", clientName.c_str(), TxtAppVer);
+		spdlog::get("file_logger")->info("adding new lgos {} {}", clientName.c_str(), TxtAppVer);
+		spdlog::get("file_logger")->info("adding new lgos {} {}", clientName.c_str(), TxtAppVer);
 
 		// Console logger with color
 		auto console = spdlog::stdout_color_mt("console");

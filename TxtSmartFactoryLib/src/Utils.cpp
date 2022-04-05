@@ -35,6 +35,7 @@ long time_offset()
 bool trycheckTimestampTTL(const std::string& str, double diff_max)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "checkTimestamp: {} offset secs:{}",str, std::chrono::seconds(time_offset()).count());
+	spdlog::get("file_logger")->trace("checkTimestamp: {} offset secs:{}",str, std::chrono::seconds(time_offset()).count());
 	auto start = ft::trygettimepoint(str) + std::chrono::seconds(time_offset());
 	auto now = std::chrono::system_clock::now();
 
@@ -116,6 +117,7 @@ double getnowtimestamp_s() {
 std::chrono::system_clock::time_point trygettimepoint(const std::string& str)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "gettimepoint {}",str);
+	spdlog::get("file_logger")->trace("gettimepoint {}",str);
 	std::string _str = str;
 	replace(_str.begin(), _str.end(), 'T', ' ');
 	_str = _str.substr(0,_str.length()-1); // ...Z

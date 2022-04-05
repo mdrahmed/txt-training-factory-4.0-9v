@@ -78,11 +78,13 @@ public:
 	/* configuration */
 	void setStepPan(uint16_t steps) {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "stepsPan:{}", steps);
+		spdlog::get("file_logger")->trace("stepsPan:{}", steps);
 		stepsPan=steps;
 	}//(steps<=STEPS_PAN_MAX)?stepsPan=steps:stepsPan=STEPS_PAN_MAX; }
 
 	void setStepTilt(uint16_t steps) {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "stepsTilt:{}", steps);
+		spdlog::get("file_logger")->trace("stepsTilt:{}", steps);
 		stepsTilt=steps;
 	}//(steps<=STEPS_TILT_MAX)?stepsTilt=steps:stepsTilt=STEPS_TILT_MAX; }
 
@@ -91,10 +93,12 @@ public:
 
 	void setSpeedPan(int16_t speed) {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "stepsPan:{}", speed);
+		spdlog::get("file_logger")->trace("Speed stepsPan:{}", speed);
 		speedPan=speed;
 	}
 	void setSpeedTilt(int16_t speed) {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "stepsTilt:{}", speed);
+		spdlog::get("file_logger")->trace("Speed stepsTilt:{}", speed);
 		speedTilt=speed;
 	}
 	int16_t getSpeedPan() { return speedPan; }

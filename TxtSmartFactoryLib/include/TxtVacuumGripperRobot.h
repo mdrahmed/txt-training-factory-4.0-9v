@@ -214,19 +214,23 @@ public:
 	/* remote */
 	void requestQuit() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestQuit",0);
+		spdlog::get("file_logger")->trace("requestQuit",0);
 		reqQuit= true;
 	}
 	void requestOrder(TxtWPType_t type) {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestOrder {}",(int)type);
+		spdlog::get("file_logger")->trace("requestOrder {}",(int)type);
 		reqWP_order = ft::TxtWorkpiece("", type, WP_STATE_RAW);
 		reqOrder= true;
 	}
 	void requestNfcRead() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestNfcRead",0);
+		spdlog::get("file_logger")->trace("requestNfcRead",0);
 		reqNfcRead= true;
 	}
 	void requestNfcDelete() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestNfcDelete",0);
+		spdlog::get("file_logger")->trace("requestNfcDelete",0);
 		reqNfcDelete= true;
 	}
 	/* local */
@@ -237,38 +241,46 @@ public:
 	}
 	void requestJoyBut(TxtJoysticksData jd) {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestJoyBut",0);
+		spdlog::get("file_logger")->trace("requestJoyBut",0);
 		joyData = jd;
 		reqJoyData = true;
 	}
 	void requestMPOstarted(TxtWorkpiece* wp) {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestMPOstarted",0);
+		spdlog::get("file_logger")->trace("requestMPOstarted",0);
 		reqWP_MPO = wp;
 		reqMPOstarted = true;
 	}
 	void requestHBWcalib_nav() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestHBWcalib_nav",0);
+		spdlog::get("file_logger")->trace("requestHBWcalib_nav",0);
 		reqHBWcalib_nav = true;
 	}
 	void requestHBWcalib_end() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestHBWcalib_end",0);
+		spdlog::get("file_logger")->trace("requestHBWcalib_end",0);
 		reqHBWcalib_end = true;
 	}
 	void requestSLDcalib_end() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestSLDcalib_end",0);
+		spdlog::get("file_logger")->trace("requestSLDcalib_end",0);
 		reqSLDcalib_end = true;
 	}
 	void requestHBWstored(TxtWorkpiece* wp) {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestHBWstored",0);
+		spdlog::get("file_logger")->trace("requestHBWstored",0);
 		reqWP_HBW = wp;
 		reqHBWstored = true;
 	}
 	void requestHBWfetched(TxtWorkpiece* wp) {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestHBWfetched",0);
+		spdlog::get("file_logger")->trace("requestHBWfetched",0);
 		reqWP_HBW = wp;
 		reqHBWfetched = true;
 	}
 	void requestSLDsorted(TxtWPType_t type) {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestSLDsorted {}",(int)type);
+		spdlog::get("file_logger")->trace("requestSLDsorted {}",(int)type);
 		reqWP_SLD.type = type;
 		reqWP_SLD.state = ft::WP_STATE_PROCESSED;
 		reqSLDsorted = true;
@@ -389,10 +401,12 @@ public:
 		: _subject(s), _mqttclient(mqttclient)
 	{
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtVacuumGripperRobotObserver",0);
+		spdlog::get("file_logger")->trace("TxtVacuumGripperRobotObserver",0);
 		_subject->Attach(this);
 	}
 	virtual ~TxtVacuumGripperRobotObserver() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtVacuumGripperRobotObserver",0);
+		spdlog::get("file_logger")->trace("~TxtVacuumGripperRobotObserver",0);
 		_subject->Detach(this);
 	}
 	void Update(ft::SubjectObserver* theChangedSubject) {

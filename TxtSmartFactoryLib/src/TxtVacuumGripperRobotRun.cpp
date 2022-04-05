@@ -41,6 +41,7 @@ namespace ft {
 void TxtVacuumGripperRobot::fsmStep()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "fsmStep",0);
+	spdlog::get("file_logger")->trace("fsmStep",0);
 
 	// Entry activities ===================================================
 	if( newState != currentState )
@@ -228,6 +229,7 @@ void TxtVacuumGripperRobot::fsmStep()
 			if (uid.length()==8) //command uid has length=8
 			{
 				SPDLOG_LOGGER_TRACE(spdlog::get("console"), "tag_uid: {}", uid);
+				spdlog::get("file_logger")->trace("tag_uid: {}", uid);
 				//set action uids if calibData is empty
 				if (joyData.aX1 > 500 || dps.getUIDResetHBW().empty())
 				{
@@ -878,6 +880,7 @@ void TxtVacuumGripperRobot::fsmStep()
 void TxtVacuumGripperRobot::moveCalibPos()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveCalibPos",0);
+	spdlog::get("file_logger")->trace("moveCalibPos",0);
 	switch(calibPos)
 	{
 	case VGRCALIB_DSI:
@@ -940,6 +943,8 @@ void TxtVacuumGripperRobot::moveCalibPos()
 void TxtVacuumGripperRobot::initDashboard()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "initDashboard", 0);
+	spdlog::get("file_logger")->trace("initDashboard", 0);
+	
 	assert(mqttclient);
 	mqttclient->publishStateHBW(ft::LEDS_OFF, "", TIMEOUT_MS_PUBLISH, 0, "");
 	mqttclient->publishStateMPO(ft::LEDS_OFF, "", TIMEOUT_MS_PUBLISH, 0, "");
@@ -958,6 +963,7 @@ void TxtVacuumGripperRobot::initDashboard()
 void TxtVacuumGripperRobot::run()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "run",0);
+	spdlog::get("file_logger")->trace("run",0);
 
 	TxtNfcDevice* nfc = dps.getNfc();
 	assert(nfc);

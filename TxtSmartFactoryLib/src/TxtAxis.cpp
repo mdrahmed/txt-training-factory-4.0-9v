@@ -18,27 +18,32 @@ TxtAxis::TxtAxis(std::string name, TxtTransfer* pT, uint8_t chM, uint8_t chS1)
 	: name(name), pT(pT), status(AXIS_NOREF), speed(512), stopReq(false), chM(chM), chS1(chS1)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{} TxtAxis chM:{} chS1:{}",name,chM,chS1);
+	spdlog::get("file_logger")->trace("{} TxtAxis chM:{} chS1:{}",name,chM,chS1);
 	setStatus(AXIS_NOREF);
 }
 
 TxtAxis::~TxtAxis() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{} ~TxtAxis",name);
+	spdlog::get("file_logger")->trace("{} ~TxtAxis",name);
 	setMotorOff();
 }
 
 void TxtAxis::setSpeed(int16_t s) {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{} setSpeed:{}",name,s);
+	spdlog::get("file_logger")->trace("{} setSpeed:{}",name,s);
 	speed=s;
 }
 
 void TxtAxis::stop() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{} stop",name);
+	spdlog::get("file_logger")->trace("{} stop",name);
 	stopReq = true;
 }
 
 void TxtAxis::configInputs(uint8_t chS)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "{} configInputs chS:{}", name, chS);
+	spdlog::get("file_logger")->trace("{} configInputs chS:{}", name, chS);
 	if ((chS<0) || (chS>15))
 	{
 		std::cout << "chS out of range master:[0-7] extension:[8-15]!" << std::endl;
@@ -64,12 +69,14 @@ void TxtAxis::configInputs(uint8_t chS)
 bool TxtAxis::isSwitchPressed(uint8_t chS)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "{} isSwitchPressed chS:{}", name, chS);
+	spdlog::get("file_logger")->trace("{} isSwitchPressed chS:{}", name, chS);
 	bool ret = (chS<8?pT->pTArea->ftX1in.uni[chS]:(pT->pTArea+1)->ftX1in.uni[chS-8]) == 1;
 	return ret;
 }
 
 void TxtAxis::setStatus(TxtAxis_status_t st) {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{} setStatus:{}",name,st);
+	spdlog::get("file_logger")->trace("{} setStatus:{}",name,st);
 	status=st;
 	std::string sst = toString(status);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console_axes"), "{} setStatus:{}",name,sst);
@@ -78,6 +85,7 @@ void TxtAxis::setStatus(TxtAxis_status_t st) {
 void TxtAxis::setMotorOff()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{}({}) setMotorOff",name,status);
+	spdlog::get("file_logger")->trace("{}({}) setMotorOff",name,status);
 	if (chM < 8)
 	{
 		assert(pT->pTArea);
@@ -95,6 +103,7 @@ void TxtAxis::setMotorOff()
 void TxtAxis::setMotorLeft()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{}({}) setMotorLeft",name,status);
+	spdlog::get("file_logger")->trace("{}({}) setMotorLeft",name,status);
 	assert(chS1<8?pT->pTArea:pT->pTArea+1);
 	if (chS1<8?pT->pTArea->ftX1in.uni[chS1]:(pT->pTArea+1)->ftX1in.uni[chS1-8] == 1)
 	{
@@ -120,6 +129,7 @@ void TxtAxis::setMotorLeft()
 void TxtAxis::setMotorRight()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{}({}) setMotorRight",name,status);
+	spdlog::get("file_logger")->trace("{}({}) setMotorRight",name,status);
 	if (chM < 8)
 	{
 		assert(pT->pTArea);

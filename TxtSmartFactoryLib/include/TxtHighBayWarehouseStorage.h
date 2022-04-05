@@ -75,10 +75,12 @@ public:
 		: _subject(s), _mqttclient(mqttclient)
 	{
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtHighBayWarehouseStorageObserver",0);
+		spdlog::get("file_logger")->trace("TxtHighBayWarehouseStorageObserver",0);
 		_subject->Attach(this);
 	}
 	virtual ~TxtHighBayWarehouseStorageObserver() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtHighBayWarehouseStorageObserver",0);
+		spdlog::get("file_logger")->trace("~TxtHighBayWarehouseStorageObserver",0);
 		_subject->Detach(this);
 	}
 	void Update(ft::SubjectObserver* theChangedSubject) {

@@ -26,6 +26,7 @@ namespace ft {
 bool TxtMultiProcessingStationCalibData::load()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "load",0);
+	spdlog::get("file_logger")->trace("load",0);
 
     std::ifstream infile(filename.c_str());
     if ( infile.good())
@@ -55,12 +56,14 @@ bool TxtMultiProcessingStationCalibData::load()
 bool TxtMultiProcessingStationCalibData::saveDefault()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "saveDefault",0);
+	spdlog::get("file_logger")->trace("saveDefault",0);
 	return save();
 }
 
 bool TxtMultiProcessingStationCalibData::save()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "save",0);
+	spdlog::get("file_logger")->trace("save",0);
 	Json::Value event;
 
     Json::StreamWriterBuilder builder;
@@ -72,6 +75,7 @@ bool TxtMultiProcessingStationCalibData::save()
     if(!outputFileStream.is_open())
 	{
     	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "filename {} is not opened!",filename.c_str());
+	spdlog::get("file_logger")->trace("filename {} is not opened!",filename.c_str());
     	return false;
 	}
     return (writer->write(event, &outputFileStream) == 0);

@@ -53,6 +53,7 @@ TxtSortingLine::TxtSortingLine(TxtTransfer* pT, ft::TxtMqttFactoryClient* mqttcl
 	obs_sld(0)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtSortingLine",0);
+	spdlog::get("file_logger")->trace("TxtSortingLine",0);
 	if (!calibData.existCalibFilename()) calibData.saveDefault();
 	calibData.load();
     configInputs();
@@ -62,12 +63,14 @@ TxtSortingLine::TxtSortingLine(TxtTransfer* pT, ft::TxtMqttFactoryClient* mqttcl
 TxtSortingLine::~TxtSortingLine()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtSortingLine",0);
+	spdlog::get("file_logger")->trace("~TxtSortingLine",0);
 	delete obs_sld;
 }
 
 bool TxtSortingLine::isColorSensorTriggered()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "isColorSensorTriggered", 0);
+	spdlog::get("file_logger")->trace("isColorSensorTriggered",0);
 	assert(pT->pTArea);
 	return (pT->pTArea->ftX1in.uni[0] != 1);
 }
@@ -75,6 +78,7 @@ bool TxtSortingLine::isColorSensorTriggered()
 bool TxtSortingLine::isEjectionTriggered()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "isEjectionTriggered", 0);
+	spdlog::get("file_logger")->trace("isEjectionTriggered",0);
 	assert(pT->pTArea);
 	return (pT->pTArea->ftX1in.uni[2] != 1);
 }
@@ -82,6 +86,7 @@ bool TxtSortingLine::isEjectionTriggered()
 bool TxtSortingLine::isWhite()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "isWhite", 0);
+	spdlog::get("file_logger")->trace("isWhite",0);
 	assert(pT->pTArea);
 	return (pT->pTArea->ftX1in.uni[5] != 1);
 }
@@ -89,6 +94,7 @@ bool TxtSortingLine::isWhite()
 bool TxtSortingLine::isRed()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "isRed", 0);
+	spdlog::get("file_logger")->trace("isRed",0);
 	assert(pT->pTArea);
 	return (pT->pTArea->ftX1in.uni[6] != 1);
 }
@@ -96,6 +102,7 @@ bool TxtSortingLine::isRed()
 bool TxtSortingLine::isBlue()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "isBlue", 0);
+	spdlog::get("file_logger")->trace("isBlue",0);
 	assert(pT->pTArea);
 	return (pT->pTArea->ftX1in.uni[7] != 1);
 }
@@ -103,6 +110,7 @@ bool TxtSortingLine::isBlue()
 int TxtSortingLine::readColorValue()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "readColorValue", 0);
+	spdlog::get("file_logger")->trace("readColorValue",0);
 	assert(pT->pTArea);
 	lastColorValue = pT->pTArea->ftX1in.uni[1];
 	return lastColorValue;
@@ -111,6 +119,7 @@ int TxtSortingLine::readColorValue()
 ft::TxtWPType_t TxtSortingLine::getLastColor()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "getLastColor", 0);
+	spdlog::get("file_logger")->trace("getLastColor",0);
 	if ((lastColorValue >= 200)&&(lastColorValue < calibData.color_th[0]))
 	{
 		return WP_TYPE_WHITE;
@@ -129,6 +138,7 @@ ft::TxtWPType_t TxtSortingLine::getLastColor()
 ft::TxtWPType_t TxtSortingLine::getDetectedColor()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "getDetectedColor", 0);
+	spdlog::get("file_logger")->trace("getDetectedColor",0);
 	if ((detectedColorValue >= 200)&&(detectedColorValue < calibData.color_th[0]))
 	{
 		return WP_TYPE_WHITE;
@@ -147,6 +157,7 @@ ft::TxtWPType_t TxtSortingLine::getDetectedColor()
 void TxtSortingLine::ejectWhite()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "ejectWhite", 0);
+	spdlog::get("file_logger")->trace("ejectWhite",0);
 	assert(pT->pTArea);
 	pT->pTArea->ftX1out.duty[chEW] = 512;
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -157,6 +168,7 @@ void TxtSortingLine::ejectWhite()
 void TxtSortingLine::ejectRed()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "ejectRed", 0);
+	spdlog::get("file_logger")->trace("ejectRed",0);
 	assert(pT->pTArea);
 	pT->pTArea->ftX1out.duty[chER] = 512;
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -167,6 +179,7 @@ void TxtSortingLine::ejectRed()
 void TxtSortingLine::ejectBlue()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "ejectBlue", 0);
+	spdlog::get("file_logger")->trace("ejectBlue",0);
 	assert(pT->pTArea);
 	pT->pTArea->ftX1out.duty[chEB] = 512;
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -177,6 +190,7 @@ void TxtSortingLine::ejectBlue()
 void TxtSortingLine::setCompressor(bool on)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "setCompressor {}", on);
+	spdlog::get("file_logger")->trace("setCompressor {}", on);
 	assert(pT->pTArea);
 	pT->pTArea->ftX1out.duty[chComp] = on ? 512 : 0; // Switch on with PWM Value 512 (= max speed)
 }
@@ -184,6 +198,7 @@ void TxtSortingLine::setCompressor(bool on)
 void TxtSortingLine::configInputs()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "configInputs", 0);
+	spdlog::get("file_logger")->trace("configInputs", 0);
 	assert(pT->pTArea);
 	//isStartColorSensor
 	pT->pTArea->ftX1config.uni[0].mode = MODE_R; // Digital Switch with PullUp resistor

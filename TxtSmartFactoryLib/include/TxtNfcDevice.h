@@ -88,10 +88,12 @@ public:
 		: _subject(s), _mqttclient(mqttclient)
 	{
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtNfcDeviceObserver",0);
+		spdlog::get("file_logger")->trace("TxtNfcDeviceObserver",0);
 		_subject->Attach(this);
 	}
 	virtual ~TxtNfcDeviceObserver() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtNfcDeviceObserver",0);
+		spdlog::get("file_logger")->trace("~TxtNfcDeviceObserver",0);
 		_subject->Detach(this);
 	}
 	void Update(ft::SubjectObserver* theChangedSubject) {

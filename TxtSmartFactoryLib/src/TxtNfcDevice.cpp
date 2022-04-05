@@ -21,17 +21,20 @@ namespace ft {
 TxtNfcDevice::TxtNfcDevice() : opened(false), pnd(NULL), context(NULL), nfcData(NULL)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtNfcDevice",0);
+	spdlog::get("file_logger")->trace("TxtNfcDevice",0);
 }
 
 TxtNfcDevice::~TxtNfcDevice()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtNfcDevice",0);
+	spdlog::get("file_logger")->trace("~TxtNfcDevice",0);
 	close();
 }
 
 bool TxtNfcDevice::open()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "open",0);
+	spdlog::get("file_logger")->trace("open",0);
 	bool verbose = true;
 	int res = 0;
 	int mask = 0x1ff;
@@ -95,6 +98,7 @@ bool TxtNfcDevice::open()
 void TxtNfcDevice::close()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "close",0);
+	spdlog::get("file_logger")->trace("close",0);
 	nfc_close(pnd);
 	nfc_exit(context);
 	opened = false;
@@ -103,6 +107,7 @@ void TxtNfcDevice::close()
 std::string TxtNfcDevice::readTagsGetUID()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "readTagsGetUID",0);
+	spdlog::get("file_logger")->trace("readTagsGetUID",0);
 	std::string uid;
 	FreefareTag* tags;
 
@@ -151,6 +156,7 @@ std::string TxtNfcDevice::readTagsGetUID()
 bool TxtNfcDevice::eraseTags()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "eraseTags",0);
+	spdlog::get("file_logger")->trace("eraseTags",0);
 	//see https://github.com/nfc-tools/libfreefare/blob/master/examples/ntag-write.c
 	bool suc = false;
 	FreefareTag* tags;
@@ -220,6 +226,7 @@ bool TxtNfcDevice::eraseTags()
 std::string TxtNfcDevice::readTags()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "readTags",0);
+	spdlog::get("file_logger")->trace("readTags",0);
 	//see https://github.com/nfc-tools/libfreefare/blob/master/examples/ntag-write.c
 	bool suc = false;
 	std::string tuid;
@@ -311,6 +318,7 @@ std::string TxtNfcDevice::readTags()
 bool TxtNfcDevice::writeTags(TxtWorkpiece wp, std::vector<uTS> vuts, uint8_t mask_ts)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "writeTags {} {} {}",(int)wp.state, (int)wp.type, vuts.size());
+	spdlog::get("file_logger")->trace("writeTags {} {} {}",(int)wp.state, (int)wp.type, vuts.size());
 	//see https://github.com/nfc-tools/libfreefare/blob/master/examples/ntag-write.c
 	bool suc = false;
 	FreefareTag* tags;
@@ -418,6 +426,7 @@ bool TxtNfcDevice::writeTags(TxtWorkpiece wp, std::vector<uTS> vuts, uint8_t mas
 void TxtNfcDevice::printNfcData()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "printNfcDataLast", 0);
+	spdlog::get("file_logger")->trace("printNfcDataLast", 0);
 	if (nfcData)
 	{
 		std::cout << "NFC Data Last" << std::endl;
@@ -437,6 +446,7 @@ void TxtNfcDevice::printNfcData()
 void TxtNfcDevice::printRawData(uint8_t* buffer)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "printData",0);
+	spdlog::get("file_logger")->trace("printData", 0);
 	//print data
 	printf("data pages 0x4...0x27:\n");
 	printf("---\n");

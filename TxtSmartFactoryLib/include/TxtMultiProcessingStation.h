@@ -102,6 +102,7 @@ public:
 	/* remote */
 	void requestQuit() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestQuit",0);
+		spdlog::get("file_logger")->trace("requestQuit",0);
 		reqQuit= true;
 	}
 	/* local */
@@ -112,11 +113,13 @@ public:
 	}
 	void requestVGRproduce(TxtWorkpiece* wp) {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestVGRproduce",0);
+		spdlog::get("file_logger")->trace("requestVGRproduce",0);
 		reqVGRwp = wp;
 		reqVGRproduce= true;
 	}
 	void requestSLDstarted() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestSLDstarted",0);
+		spdlog::get("file_logger")->trace("requestSLDstarted",0);
 		reqSLDstarted= true;
 	}
 
@@ -175,10 +178,12 @@ public:
 		: _subject(s), _mqttclient(mqttclient)
 	{
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtMultiProcessingStationObserver",0);
+		spdlog::get("file_logger")->trace( "TxtMultiProcessingStationObserver",0);
 		_subject->Attach(this);
 	}
 	virtual ~TxtMultiProcessingStationObserver() {
-		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtMultiProcessingStationObserver",0);
+		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"~TxtMultiProcessingStationObserver",0);
+		spdlog::get("file_logger")->trace("~TxtMultiProcessingStationObserver",0);
 		_subject->Detach(this);
 	}
 	void Update(ft::SubjectObserver* theChangedSubject) {

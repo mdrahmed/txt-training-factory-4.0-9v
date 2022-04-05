@@ -20,6 +20,7 @@ TxtHighBayWarehouseStorage::TxtHighBayWarehouseStorage()
 	: filename("Data/Config.HBW.Storage.json")
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtHighBayWarehouseStorage",0);
+	spdlog::get("file_logger")->trace("TxtHighBayWarehouseStorage",0);
 	if (!loadStorageState())
 	{
 		resetStorageState();
@@ -37,11 +38,13 @@ TxtHighBayWarehouseStorage::TxtHighBayWarehouseStorage()
 TxtHighBayWarehouseStorage::~TxtHighBayWarehouseStorage()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtHighBayWarehouseStorage",0);
+	spdlog::get("file_logger")->trace("~TxtHighBayWarehouseStorage",0);
 }
 
 bool TxtHighBayWarehouseStorage::loadStorageState()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "loadStorageState",0);
+	spdlog::get("file_logger")->trace("loadStorageState",0);
     std::ifstream infile(filename.c_str());
     if ( infile.good())
     {
@@ -98,6 +101,7 @@ bool TxtHighBayWarehouseStorage::loadStorageState()
 bool TxtHighBayWarehouseStorage::saveStorageState()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "saveStorageState",0);
+	spdlog::get("file_logger")->trace("saveStorageState",0);
 	Json::Value event;
     const char * locations[3][3] = {{"A1","A2","A3"},{"B1","B2","B3"},{"C1","C2","C3"}};
 	for(int i=0;i<3;i++)
@@ -124,6 +128,7 @@ bool TxtHighBayWarehouseStorage::saveStorageState()
     if(!outputFileStream.is_open())
 	{
     	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "filename {} is not opened!",filename.c_str());
+    	spdlog::get("file_logger")->trace("filename {} is not opened!",filename.c_str());
     	return false;
 	}
     return (writer->write(event, &outputFileStream) == 0);
@@ -132,6 +137,7 @@ bool TxtHighBayWarehouseStorage::saveStorageState()
 void TxtHighBayWarehouseStorage::resetStorageState()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "resetStorageState",0);
+    	spdlog::get("file_logger")->trace("resetStorageState",0);
 	for(int i=0;i<3;i++)
 	{
 		for(int j=0;j<3;j++)
@@ -147,6 +153,7 @@ void TxtHighBayWarehouseStorage::resetStorageState()
 bool TxtHighBayWarehouseStorage::storeContainer()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "storeContainer",0);
+    	spdlog::get("file_logger")->trace("storeContainer",0);
 	/*nextStorePos.x = -1; //set invalid pos
 	nextStorePos.y = -1;
 	bool found = false;
@@ -178,6 +185,7 @@ bool TxtHighBayWarehouseStorage::storeContainer()
 bool TxtHighBayWarehouseStorage::store(TxtWorkpiece _wp)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "store wp:{} {} {}",_wp.tag_uid,_wp.type,_wp.state);
+	spdlog::get("file_logger")->trace("store wp:{} {} {}",_wp.tag_uid,_wp.type,_wp.state);
 	/*nextStorePos.x = -1; //set invalid pos
 	nextStorePos.y = -1;
 	if (_wp.type == WP_TYPE_NONE)
@@ -216,6 +224,7 @@ bool TxtHighBayWarehouseStorage::store(TxtWorkpiece _wp)
 bool TxtHighBayWarehouseStorage::fetch(TxtWPType_t t)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "fetch {}",t);
+	spdlog::get("file_logger")->trace("fetch {}",t);
 	nextFetchPos.x = -1; //set invalid pos
 	nextFetchPos.y = -1;
 	if (t == WP_TYPE_NONE)
@@ -257,6 +266,7 @@ bool TxtHighBayWarehouseStorage::fetch(TxtWPType_t t)
 bool TxtHighBayWarehouseStorage::fetchContainer()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "fetchContainer",0);
+	spdlog::get("file_logger")->trace("fetchContainer",0);
 	nextFetchPos.x = -1; //set invalid pos
 	nextFetchPos.y = -1;
 	bool found = false;
@@ -288,6 +298,7 @@ bool TxtHighBayWarehouseStorage::fetchContainer()
 bool TxtHighBayWarehouseStorage::isValidPos(StoragePos2 p)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "isValidPos {} {}",p.x,p.y);
+	spdlog::get("file_logger")->trace("isValidPos {} {}",p.x,p.y);
 	bool ret = false;
 	if ((p.x >= 0) && (p.x <= 2) && (p.y >= 0) && (p.y <= 2))
 	{
@@ -300,6 +311,7 @@ bool TxtHighBayWarehouseStorage::isValidPos(StoragePos2 p)
 bool TxtHighBayWarehouseStorage::canColorBeStored(TxtWPType_t c)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "canColorBeStored {}", c);
+	spdlog::get("file_logger")->trace("canColorBeStored {}", c);
 	bool ret = false;
 	int numc = 0;
 	for(int i=0;i<3;i++)
@@ -321,6 +333,7 @@ bool TxtHighBayWarehouseStorage::canColorBeStored(TxtWPType_t c)
 Stock_map_t TxtHighBayWarehouseStorage::getStockMap()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "getStockMap",0);
+	spdlog::get("file_logger")->trace("getStockMap",0);
 	Stock_map_t map_wps;
 	map_wps["A1"] =  wp[0][0];
 	map_wps["A2"] =  wp[1][0];
@@ -365,6 +378,7 @@ char TxtHighBayWarehouseStorage::charType(int x, int y)
 void TxtHighBayWarehouseStorage::print()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "print",0);
+	spdlog::get("file_logger")->trace("print",0);
 	std::cout << charType(0,0) << charType(1,0) << charType(2,0) << std::endl;
 	std::cout << charType(0,1) << charType(1,1) << charType(2,1) << std::endl;
 	std::cout << charType(0,2) << charType(1,2) << charType(2,2) << std::endl;

@@ -42,6 +42,7 @@ namespace ft {
 void TxtHighBayWarehouse::fsmStep()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "fsmStep",0);
+	spdlog::get("file_logger")->trace("fsmStep",0);
 
 	// Entry activities ===================================================
 	if( newState != currentState )
@@ -358,6 +359,7 @@ void TxtHighBayWarehouse::fsmStep()
 void TxtHighBayWarehouse::moveCalibPos()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveCalibPos",0);
+	spdlog::get("file_logger")->trace("moveCalibPos",0);
 	switch(calibPos)
 	{
 	case HBWCALIB_CV:
@@ -385,6 +387,7 @@ void TxtHighBayWarehouse::moveCalibPos()
 void TxtHighBayWarehouse::run()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "run",0);
+	spdlog::get("file_logger")->trace("run",0);
 	assert(mqttclient);
 	obs_hbw = new TxtHighBayWarehouseObserver(this, mqttclient);
 	obs_storage = new TxtHighBayWarehouseStorageObserver(getStorage(), mqttclient);

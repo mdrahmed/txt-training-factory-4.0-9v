@@ -28,7 +28,10 @@ public:
 
 	cv::Mat getFrame();
 
-	void setFps(double f) { SPDLOG_LOGGER_TRACE(spdlog::get("console"), ""); fps = f; }
+	void setFps(double f) { 
+		SPDLOG_LOGGER_TRACE(spdlog::get("console"), ""); fps = f; 
+		spdlog::get("file_logger")->trace("FPS set to {}",f);
+	}
 	double getPeriod() { return 1000./fps; }
 
 	bool startThread();

@@ -36,16 +36,19 @@ void TxtSound::play(FISH_X1_TRANSFER* pTArea, int r,  int num)
 TxtSound::TxtSound(TxtTransfer* pT) : pT(pT), mute(false)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtSound",0);
+	spdlog::get("file_logger")->trace("TxtSound",0);
 }
 
 TxtSound::~TxtSound()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtSound",0);
+	spdlog::get("file_logger")->trace("~TxtSound",0);
 }
 
 void TxtSound::play(int num, int repeat)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "play num:{} repeat:{}",num,repeat);
+	spdlog::get("file_logger")->trace("play num:{} repeat:{}",num,repeat);
 	if (!mute)
 	{
 		assert(pT);

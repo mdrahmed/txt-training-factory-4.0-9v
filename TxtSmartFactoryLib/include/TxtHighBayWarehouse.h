@@ -133,6 +133,7 @@ public:
 	/* remote */
 	void requestQuit() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestQuit",0);
+		spdlog::get("file_logger")->trace("requestQuit",0);
 		reqQuit= true;
 	}
 	/* local */
@@ -143,34 +144,41 @@ public:
 	}
 	void requestVGRfetchContainer(TxtWorkpiece* wp) {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"reqVGRfetchContainer",0);
+		spdlog::get("file_logger")->trace("reqVGRfetchContainer",0);
 		reqVGRwp = wp;
 		reqVGRfetchContainer= true;
 	}
 	void requestVGRstore(TxtWorkpiece* wp) {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"reqVGRstore",0);
+		spdlog::get("file_logger")->trace("reqVGRstore",0);
 		reqVGRwp = wp;
 		reqVGRstore= true;
 	}
 	void requestVGRfetch(TxtWorkpiece* wp) {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"reqVGRfetch",0);
+		spdlog::get("file_logger")->trace("reqVGRfetch",0);
 		reqVGRwp = wp;
 		reqVGRfetch= true;
 	}
 	void requestVGRstoreContainer(TxtWorkpiece* wp) {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestVGRstoreContainer",0);
+		spdlog::get("file_logger")->trace("requestVGRstoreContainer",0);
 		reqVGRwp = wp;
 		reqVGRstoreContainer= true;
 	}
 	void requestVGRcalib() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestVGRcalib",0);
+		spdlog::get("file_logger")->trace("requestVGRcalib",0);
 		reqVGRcalib= true;
 	}
 	void requestVGRresetStorage() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestVGRresetStorage",0);
+		spdlog::get("file_logger")->trace("requestVGRresetStorage",0);
 		reqVGRresetStorage= true;
 	}
 	void requestJoyBut(TxtJoysticksData jd) {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestJoyBut",0);
+		spdlog::get("file_logger")->trace("requestJoyBut",0);
 		joyData = jd;
 		reqJoyData = true;
 	}
@@ -261,10 +269,12 @@ public:
 		: _subject(s), _mqttclient(mqttclient)
 	{
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtHighBayWarehouseObserver",0);
+		spdlog::get("file_logger")->trace("TxtHighBayWarehouseObserver",0);
 		_subject->Attach(this);
 	}
 	virtual ~TxtHighBayWarehouseObserver() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtHighBayWarehouseObserver",0);
+		spdlog::get("file_logger")->trace("~TxtHighBayWarehouseObserver",0);
 		_subject->Detach(this);
 	}
 	void Update(ft::SubjectObserver* theChangedSubject) {

@@ -18,16 +18,19 @@ TxtVacuumGripper::TxtVacuumGripper(TxtTransfer* pT, uint8_t chComp, uint8_t chVa
 	: pT(pT), chComp(chComp), chValve(chValve)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtVacuumGripper chComp:{} chValve:{}",  chComp, chValve);
+	spdlog::get("file_logger")->trace("TxtVacuumGripper chComp:{} chValve:{}",  chComp, chValve);
 }
 
 TxtVacuumGripper::~TxtVacuumGripper()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtVacuumGripper", 0);
+	spdlog::get("file_logger")->trace("~TxtVacuumGripper", 0);
 }
 
 void TxtVacuumGripper::grip()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "grip", 0);
+	spdlog::get("file_logger")->trace("grip", 0);
 	setCompressor(true);
 	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 	if (chValve < 8)
@@ -45,6 +48,7 @@ void TxtVacuumGripper::grip()
 void TxtVacuumGripper::release()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "release", 0);
+	spdlog::get("file_logger")->trace("release", 0);
 	if (chValve < 8)
 	{
 		assert(pT->pTArea);
@@ -61,6 +65,7 @@ void TxtVacuumGripper::release()
 void TxtVacuumGripper::setCompressor(bool on)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "setCompressor {}", on);
+	spdlog::get("file_logger")->trace("setCompressor {}", on);
 	if (chComp < 8)
 	{
 		assert(pT->pTArea);

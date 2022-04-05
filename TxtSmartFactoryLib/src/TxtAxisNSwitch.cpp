@@ -17,6 +17,7 @@ TxtAxisNSwitch::TxtAxisNSwitch(std::string name, TxtTransfer* pT, uint8_t chM, u
 	: TxtAxis(name, pT, chM, chS1), chS2X()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{} TxtAxisNSwitch chM:{} chS1:{} chS2:{}",name,chM,chS1,chS2);
+	spdlog::get("file_logger")->trace("{} TxtAxisNSwitch chM:{} chS1:{} chS2:{}",name,chM,chS1,chS2);
 	chS2X.push_back(chS1);
 	chS2X.push_back(chS2);
 	configInputs(chS1);
@@ -28,6 +29,7 @@ TxtAxisNSwitch::TxtAxisNSwitch(std::string name, TxtTransfer* pT, uint8_t chM, u
 	: TxtAxis(name, pT, chM, chS1), chS2X()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{} TxtAxisNSwitch chM:{} chS1:{} chS2:{} chS3:{}",name,chM,chS1,chS2,chS3);
+	spdlog::get("file_logger")->trace("{} TxtAxisNSwitch chM:{} chS1:{} chS2:{} chS3:{}",name,chM,chS1,chS2,chS3);
 	chS2X.push_back(chS1);
 	chS2X.push_back(chS2);
 	chS2X.push_back(chS3);
@@ -40,11 +42,13 @@ TxtAxisNSwitch::TxtAxisNSwitch(std::string name, TxtTransfer* pT, uint8_t chM, u
 TxtAxisNSwitch::~TxtAxisNSwitch()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{} ~TxtAxisNSwitch",name);
+	spdlog::get("file_logger")->trace("{} ~TxtAxisNSwitch",name);
 }
 
 void TxtAxisNSwitch::moveS2X(int idx)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{} moveS2X[{}]",name,idx);
+	spdlog::get("file_logger")->trace("{} moveS2X[{}]",name,idx);
 	if (!isS2XValid(idx))
 	{
 		spdlog::get("console_axes")->error("{} Error: index {} for S2X is out of bounds!",name,idx);

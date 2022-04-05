@@ -21,6 +21,7 @@ namespace ft {
 bool TxtVacuumGripperRobotCalibData::load()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "loadCalib",0);
+	spdlog::get("file_logger")->trace("loadCalib",0);
 
     std::ifstream infile(filename.c_str());
     if ( infile.good())
@@ -73,6 +74,7 @@ bool TxtVacuumGripperRobotCalibData::load()
 bool TxtVacuumGripperRobotCalibData::saveDefault()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "saveDefault",0);
+	spdlog::get("file_logger")->trace("saveDefault",0);
 
 	setPos3("DIN0", EncPos3(22, 600, 19));
 	setPos3("DIN", EncPos3(22, 758, 19));
@@ -111,6 +113,7 @@ bool TxtVacuumGripperRobotCalibData::saveDefault()
 bool TxtVacuumGripperRobotCalibData::save()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "save",0);
+	spdlog::get("file_logger")->trace("save",0);
 	Json::Value event;
 	int i = 0;
     event["VGR"]["pos3list"][i]["DIN0"]["x"] =   map_pos3["DIN0"].x;
@@ -195,6 +198,7 @@ bool TxtVacuumGripperRobotCalibData::save()
     if(!outputFileStream.is_open())
 	{
     	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "filename {} is not opened!",filename.c_str());
+    	spdlog::get("file_logger")->trace("filename {} is not opened!",filename.c_str());
     	return false;
 	}
     return (writer->write(event, &outputFileStream) == 0);

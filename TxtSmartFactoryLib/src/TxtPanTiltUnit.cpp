@@ -19,6 +19,7 @@ TxtPanTiltUnit::TxtPanTiltUnit(TxtTransfer* pT, uint8_t chPan, uint8_t chTilt)
   chPan(chPan), chTilt(chTilt)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtPanTiltUnit chPan:{} chTilt:{}",  chPan, chTilt);
+	spdlog::get("file_logger")->trace("TxtPanTiltUnit chPan:{} chTilt:{}",  chPan, chTilt);
 	if (!calibData.existCalibFilename()) calibData.saveDefault();
 	calibData.load();
 	configInputs(chPan);
@@ -27,6 +28,7 @@ TxtPanTiltUnit::TxtPanTiltUnit(TxtTransfer* pT, uint8_t chPan, uint8_t chTilt)
 
 TxtPanTiltUnit::~TxtPanTiltUnit() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtPanTiltUnit");
+	spdlog::get("file_logger")->trace("~TxtPanTiltUnit");
 	if (pT->pTArea)
 	{
 		//switch off Motors
@@ -36,6 +38,7 @@ TxtPanTiltUnit::~TxtPanTiltUnit() {
 
 bool TxtPanTiltUnit::init() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "init");
+	spdlog::get("file_logger")->trace("init");
 	status = PTU_NOHOME;
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "status=PTU_NOHOME");
 	return true;
@@ -43,12 +46,14 @@ bool TxtPanTiltUnit::init() {
 
 void TxtPanTiltUnit::stop() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "stop");
+	spdlog::get("file_logger")->trace("stop");
 	stopAllReq = true;
 }
 
 void TxtPanTiltUnit::configInputs(uint8_t chS)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "configInputs chS:{}", chS);
+	spdlog::get("file_logger")->trace("configInputs chS:{}", chS);
 	assert(pT->pTArea);
 	pT->pTArea->ftX1config.uni[chS].mode = MODE_R; // Digital Switch with PullUp resistor
 	pT->pTArea->ftX1config.uni[chS].digital = 1;
@@ -79,16 +84,20 @@ void TxtPanTiltUnit::setMotorTiltOff() {
 void TxtPanTiltUnit::moveLeft(uint8_t ch, uint16_t steps, int16_t speed, uint16_t* p, uint16_t posEnd) {
 	assert(p!=NULL);
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveLeft ch:{} steps:{} speed:{} p:{} posEnd:{}", ch, steps, speed, *p, posEnd);
+	spdlog::get("file_logger")->trace("moveLeft ch:{} steps:{} speed:{} p:{} posEnd:{}", ch, steps, speed, *p, posEnd);
 	if (steps <= 0) {
 		spdlog::get("console")->warn("Warning: steps<=0. Exit function.");
+		spdlog::get("file_logger")->warn("Warning: steps<=0. Exit function.");
 		return;
 	}
 	if (status == PTU_NOHOME) {
 		spdlog::get("console")->error("Error: status == PTU_NOHOME. Execute moveHome() first! Exit function.");
+		spdlog::get("file_logger")->error("Error: status == PTU_NOHOME. Execute moveHome() first! Exit function.");
 		return;
 	}
 	if (status != PTU_READY) {
 		spdlog::get("console")->error("Error: status != PTU_READY. Exit function.");
+		spdlog::get("file_logger")->error("Error: status != PTU_READY. Exit function.");
 		return;
 	}
 	int16_t posa = *p;
@@ -129,6 +138,7 @@ void TxtPanTiltUnit::moveLeft(uint8_t ch, uint16_t steps, int16_t speed, uint16_
 		if (diff_s > diff_max) {
 			status = PTU_TIMEOUT_MOVELEFT;
 			spdlog::get("console")->warn("diff_s > diff_max: status==PTU_TIMEOUT_MOVELEFT, diff_s:{} diff_max:{}",diff_s,diff_max);
+			spdlog::get("file_logger")->warn("diff_s > diff_max: status==PTU_TIMEOUT_MOVELEFT, diff_s:{} diff_max:{}",diff_s,diff_max);
 			break;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -152,16 +162,20 @@ void TxtPanTiltUnit::moveLeft(uint8_t ch, uint16_t steps, int16_t speed, uint16_
 void TxtPanTiltUnit::moveRight(uint8_t ch, uint16_t steps, int16_t speed, uint16_t* p, uint16_t posEnd) {
 	assert(p!=NULL);
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveRight ch:{} steps:{} speed:{} p:{} posEnd:{}", ch, steps, speed, *p, posEnd);
+	spdlog::get("file_logger")->trace("moveRight ch:{} steps:{} speed:{} p:{} posEnd:{}", ch, steps, speed, *p, posEnd);
 	if (steps <= 0) {
 		spdlog::get("console")->warn("Warning: steps<=0. Exit function.");
+		spdlog::get("file_logger")->warn("Warning: steps<=0. Exit function.");
 		return;
 	}
 	if (status == PTU_NOHOME) {
 		spdlog::get("console")->error("Error: status == PTU_NOHOME. Execute moveHome() first! Exit function.");
+		spdlog::get("file_logger")->error("Error: status == PTU_NOHOME. Execute moveHome() first! Exit function.");
 		return;
 	}
 	if (status != PTU_READY) {
 		spdlog::get("console")->error("Error: status != PTU_READY. Exit function.");
+		spdlog::get("file_logger")->error("Error: status != PTU_READY. Exit function.");
 		return;
 	}
 	int16_t posa = *p;
@@ -200,6 +214,7 @@ void TxtPanTiltUnit::moveRight(uint8_t ch, uint16_t steps, int16_t speed, uint16
 		if (diff_s > diff_max) {
 			status = PTU_TIMEOUT_MOVERIGHT;
 			spdlog::get("console")->warn("diff_s > diff_max: status==PTU_TIMEOUT_MOVERIGHT, diff_s:{} diff_max:{}",diff_s,diff_max);
+			spdlog::get("file_logger")->warn("diff_s > diff_max: status==PTU_TIMEOUT_MOVERIGHT, diff_s:{} diff_max:{}",diff_s,diff_max);
 			break;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -214,6 +229,7 @@ void TxtPanTiltUnit::moveRight(uint8_t ch, uint16_t steps, int16_t speed, uint16
 
 void TxtPanTiltUnit::movePanLeft(uint16_t steps) {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "movePanLeft steps:{} posPan:{}", steps, posPan);
+	spdlog::get("file_logger")->trace("movePanLeft steps:{} posPan:{}", steps, posPan);
 	uint16_t p = posPan;
 	moveLeft(chPan, steps, speedPan, &p, calibData.posEndPan);
 	if (status == PTU_READY) {
@@ -225,6 +241,7 @@ void TxtPanTiltUnit::movePanLeft(uint16_t steps) {
 
 void TxtPanTiltUnit::movePanRight(uint16_t steps) {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "movePanRight steps:{} posPan:{}", steps, posPan);
+	spdlog::get("file_logger")->trace("movePanRight steps:{} posPan:{}", steps, posPan);
 	uint16_t p = posPan;
 	moveRight(chPan, steps, speedPan, &p, calibData.posEndPan);
 	if (status == PTU_READY) {
@@ -236,6 +253,7 @@ void TxtPanTiltUnit::movePanRight(uint16_t steps) {
 
 void TxtPanTiltUnit::moveTiltUp(uint16_t steps) {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveTiltUp steps:{} posTilt:{}", steps, posTilt);
+	spdlog::get("file_logger")->trace("moveTiltUp steps:{} posTilt:{}", steps, posTilt);
 	uint16_t p = posTilt;
 	moveRight(chTilt, steps, speedTilt, &p, calibData.posEndTilt);
 	if (status == PTU_READY) {
@@ -247,6 +265,7 @@ void TxtPanTiltUnit::moveTiltUp(uint16_t steps) {
 
 void TxtPanTiltUnit::moveTiltDown(uint16_t steps) {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveTiltDown steps:{} posTilt:{}", steps, posTilt);
+	spdlog::get("file_logger")->trace("moveTiltDown steps:{} posTilt:{}", steps, posTilt);
 	uint16_t p = posTilt;
 	moveLeft(chTilt, steps, speedTilt, &p, calibData.posEndTilt);
 	if (status == PTU_READY) {
@@ -258,6 +277,7 @@ void TxtPanTiltUnit::moveTiltDown(uint16_t steps) {
 
 bool TxtPanTiltUnit::movePanPos(uint16_t pPan) {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "movePanPos pPan:{}", pPan);
+	spdlog::get("file_logger")->trace("movePanPos pPan:{}", pPan);
 	if (pPan == posPan) {
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pPan:{} == posPan:{}", pPan, posPan);
 		return true;
@@ -277,6 +297,7 @@ bool TxtPanTiltUnit::movePanPos(uint16_t pPan) {
 
 bool TxtPanTiltUnit::moveTiltPos(uint16_t pTilt) {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveTiltPos pTilt:{}", pTilt);
+	spdlog::get("file_logger")->trace("moveTiltPos pTilt:{}", pTilt);
 	if (pTilt == posTilt) {
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pTilt:{} == posTilt:{}", pTilt, posTilt);
 		return true;
@@ -296,6 +317,7 @@ bool TxtPanTiltUnit::moveTiltPos(uint16_t pTilt) {
 
 bool TxtPanTiltUnit::movePos(uint16_t pPan, uint16_t pTilt) {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "movePos pPan:{} pTilt:{}", pPan, pTilt);
+	spdlog::get("file_logger")->trace("movePos pPan:{} pTilt:{}", pPan, pTilt);
 	bool retP = movePanPos(pPan);
 	if (!retP) {
 		return false;
@@ -309,6 +331,7 @@ bool TxtPanTiltUnit::movePos(uint16_t pPan, uint16_t pTilt) {
 
 void TxtPanTiltUnit::moveHome() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveHome");
+	spdlog::get("file_logger")->trace("moveHome");
 	/*TODO if (status != PTU_READY) {
     	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "status != PTU_READY, return");
     	return;
@@ -360,6 +383,7 @@ void TxtPanTiltUnit::moveHome() {
 		if (diff_s > TIMEOUT_S_MOVEHOME) {
 			status = PTU_TIMEOUT_MOVEHOME;
 			spdlog::get("console")->warn("diff_s > TIMEOUT_S_MOVEHOME: status==PTU_TIMEOUT_MOVEHOME, diff_s:{} diff_max:{}",diff_s,TIMEOUT_S_MOVEHOME);
+			spdlog::get("file_logger")->warn("diff_s > TIMEOUT_S_MOVEHOME: status==PTU_TIMEOUT_MOVEHOME, diff_s:{} diff_max:{}",diff_s,TIMEOUT_S_MOVEHOME);
 			break;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -376,61 +400,73 @@ void TxtPanTiltUnit::moveHome() {
 
 bool TxtPanTiltUnit::moveCenter() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveCenter");
+	spdlog::get("file_logger")->trace("moveCenter");
 	return movePos(calibData.posCenterPan, calibData.posCenterTilt);
 }
 
 bool TxtPanTiltUnit::moveHBW() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveHBW");
+	spdlog::get("file_logger")->trace("moveHBW");
 	return movePos(calibData.posHBWPan, calibData.posHBWTilt);
 }
 
 void TxtPanTiltUnit::movePan0() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "movePan0");
+	spdlog::get("file_logger")->trace("movePan0");
 	movePanPos(0);
 }
 
 void TxtPanTiltUnit::movePanCenter() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "movePanCenter");
+	spdlog::get("file_logger")->trace("movePanCenter");
 	movePanPos(calibData.posCenterPan);
 }
 
 void TxtPanTiltUnit::movePanEnd() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "movePanEnd");
+	spdlog::get("file_logger")->trace("movePanEnd");
 	movePanPos(calibData.posEndPan);
 }
 
 void TxtPanTiltUnit::moveTilt0() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveTilt0");
+	spdlog::get("file_logger")->trace("moveTilt0");
 	moveTiltPos(0);
 }
 
 void TxtPanTiltUnit::moveTiltCenter() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveTiltStart");
+	spdlog::get("file_logger")->trace("moveTiltStart");
 	moveTiltPos(calibData.posCenterTilt);
 }
 
 void TxtPanTiltUnit::moveTiltEnd() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveTiltEnd");
+	spdlog::get("file_logger")->trace("moveTiltEnd");
 	moveTiltPos(calibData.posEndTilt);
 }
 
 void TxtPanTiltUnit::moveStepPanLeft() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveStepPanLeft");
+	spdlog::get("file_logger")->trace("moveStepPanLeft");
 	movePanLeft(stepsPan);
 }
 
 void TxtPanTiltUnit::moveStepPanRight() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveStepPanRight");
+	spdlog::get("file_logger")->trace("moveStepPanRight");
 	movePanRight(stepsPan);
 }
 
 void TxtPanTiltUnit::moveStepTiltUp() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveStepTiltUp");
+	spdlog::get("file_logger")->trace("moveStepTiltUp");
 	moveTiltUp(stepsTilt);
 }
 
 void TxtPanTiltUnit::moveStepTiltDown() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveStepTiltDown");
+	spdlog::get("file_logger")->trace("moveStepTiltDown");
 	moveTiltDown(stepsTilt);
 }
 
@@ -439,6 +475,7 @@ TxtPanTiltUnitController::TxtPanTiltUnitController(TxtPanTiltUnit* ptu, int mode
 : ptu(ptu), mode(mode), scmd(""), busy(false), steps(0), m_stoprequested(false), m_running(false), m_mutex(), m_thread()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtPanTiltUnitController mode:{}", mode);
+	spdlog::get("file_logger")->trace("TxtPanTiltUnitController mode:{}", mode);
 	pthread_mutexattr_t attr;
 	pthread_mutexattr_init(&attr);
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -447,12 +484,14 @@ TxtPanTiltUnitController::TxtPanTiltUnitController(TxtPanTiltUnit* ptu, int mode
 
 TxtPanTiltUnitController::~TxtPanTiltUnitController() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtPanTiltUnitController");
+	spdlog::get("file_logger")->trace("~TxtPanTiltUnitController");
 	if (m_running) stopThread();
 	pthread_mutex_destroy(&m_mutex);
 }
 
 bool TxtPanTiltUnitController::startThread() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "start");
+	spdlog::get("file_logger")->trace("start");
 	//go
 	assert(m_running == false);
 	m_running = true;
@@ -473,6 +512,7 @@ bool TxtPanTiltUnitController::startThread() {
 
 bool TxtPanTiltUnitController::stopThread() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "stop");
+	spdlog::get("file_logger")->trace("stop");
 	//stop
 	assert(m_running == true);
 	m_running = false;
@@ -482,6 +522,7 @@ bool TxtPanTiltUnitController::stopThread() {
 
 bool TxtPanTiltUnitController::executeCmd(const std::string scmd, int steps) {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "executeCmd {} {}", scmd.c_str(), steps);
+	spdlog::get("file_logger")->trace("executeCmd {} {}", scmd.c_str(), steps);
 	if (!busy) {
 		pthread_mutex_lock(&m_mutex);
 		this->scmd = scmd;
@@ -494,6 +535,7 @@ bool TxtPanTiltUnitController::executeCmd(const std::string scmd, int steps) {
 
 void TxtPanTiltUnitController::run() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "run");
+	spdlog::get("file_logger")->trace("run");
 	assert(ptu);
 	while (!m_stoprequested)
 	{

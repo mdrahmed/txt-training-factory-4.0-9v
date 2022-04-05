@@ -16,16 +16,19 @@ namespace ft {
 TxtFactoryProcessStorage::TxtFactoryProcessStorage()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtFactoryProcessStorage",0);
+	spdlog::get("file_logger")->trace("TxtFactoryProcessStorage",0);
 }
 
 TxtFactoryProcessStorage::~TxtFactoryProcessStorage()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtFactoryProcessStorage",0);
+	spdlog::get("file_logger")->trace("~TxtFactoryProcessStorage",0);
 }
 
 void TxtFactoryProcessStorage::setTimestampNow(const std::string tag_uid, TxtHistoryIndex_t i)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "setTimestampNow",0);
+	spdlog::get("file_logger")->trace("setTimestampNow",0);
 	if (tag_uid.empty())
 	{
     	printf("uid: %s\n",tag_uid.c_str());
@@ -63,6 +66,7 @@ void TxtFactoryProcessStorage::setTimestampNow(const std::string tag_uid, TxtHis
 std::vector<int64_t> TxtFactoryProcessStorage::getTagUidVts(const std::string tag_uid)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "getTagUidVts",0);
+	spdlog::get("file_logger")->trace("getTagUidVts",0);
 	std::vector<int64_t> vts;
 	auto search = map_vts.find(tag_uid);
     if (search != map_vts.end())
@@ -78,6 +82,7 @@ std::vector<int64_t> TxtFactoryProcessStorage::getTagUidVts(const std::string ta
 uint8_t TxtFactoryProcessStorage::getTagUidMaskTs(const std::string tag_uid)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "getTagUidMaskTs",0);
+	spdlog::get("file_logger")->trace("getTagUidMaskTs",0);
 	uint8_t mask_ts = 0x0;
 	auto search = map_mask_ts.find(tag_uid);
     if (search != map_mask_ts.end())
@@ -93,6 +98,7 @@ uint8_t TxtFactoryProcessStorage::getTagUidMaskTs(const std::string tag_uid)
 void TxtFactoryProcessStorage::resetTagUidMaskTs(const std::string tag_uid)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "resetTagUidMaskTs",0);
+	spdlog::get("file_logger")->trace("resetTagUidMaskTs",0);
 	map_mask_ts[tag_uid] = 0x0;
 	//printMap();
 }
@@ -100,6 +106,7 @@ void TxtFactoryProcessStorage::resetTagUidMaskTs(const std::string tag_uid)
 void TxtFactoryProcessStorage::printMap()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "printMap",0);
+	spdlog::get("file_logger")->trace("printMap",0);
     for (std::map<std::string, std::vector<int64_t> > ::const_iterator it=map_vts.begin(); it!=map_vts.end(); ++it)
     {
     	std::string uid = it->first;

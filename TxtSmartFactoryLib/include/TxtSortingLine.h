@@ -124,6 +124,7 @@ public:
 	/* remote */
 	void requestQuit() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestQuit",0);
+		spdlog::get("file_logger")->trace("requestQuit",0);
 		reqQuit= true;
 	}
 	/* local */
@@ -134,18 +135,22 @@ public:
 	}
 	void requestMPOproduced() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestMPOproduced",0);
+		spdlog::get("file_logger")->trace("requestMPOproduced",0);
 		reqMPOproduced= true;
 	}
 	void requestVGRstart() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestVGRstart",0);
+		spdlog::get("file_logger")->trace("requestVGRstart",0);
 		reqVGRstart= true;
 	}
 	void requestVGRcalib() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestVGRcalib",0);
+		spdlog::get("file_logger")->trace("requestVGRcalib",0);
 		reqVGRcalib= true;
 	}
 	void requestJoyBut(TxtJoysticksData jd) {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"requestJoyBut",0);
+		spdlog::get("file_logger")->trace("requestJoyBut",0);
 		joyData = jd;
 		reqJoyData = true;
 	}
@@ -207,10 +212,12 @@ public:
 		: _subject(s), _mqttclient(mqttclient)
 	{
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtSortingLineObserver",0);
+		spdlog::get("file_logger")->trace("TxtSortingLineObserver",0);
 		_subject->Attach(this);
 	}
 	virtual ~TxtSortingLineObserver() {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtSortingLineObserver",0);
+		spdlog::get("file_logger")->trace("~TxtSortingLineObserver",0);
 		_subject->Detach(this);
 	}
 	void Update(ft::SubjectObserver* theChangedSubject) {

@@ -37,6 +37,7 @@ void output_ready(int64_t timestamp, float iaq, uint8_t iaq_accuracy, float temp
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "{} {} {} {} {} {} {} {} {} {}",
 			timestamp,iaq,iaq_accuracy,temperature,humidity,
 			pressure,raw_temperature,raw_humidity,gas,bsec_status);
+	spdlog::get("file_logger")->trace("{} {} {} {} {} {} {} {} {} {}",timestamp,iaq,iaq_accuracy,temperature,humidity,pressure,raw_temperature,raw_humidity,gas,bsec_status);
 
 	if (pBme680) {
 		pBme680->_timestamp = timestamp;
@@ -61,6 +62,7 @@ TxtBME680::TxtBME680(float sample_rate, float temp_offset)
 	m_stoprequested(false), m_running(false), m_mutex(), m_thread()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "", 0);
+	spdlog::get("file_logger")->trace("", 0);
 	pthread_mutexattr_t attr;
 	pthread_mutexattr_init(&attr);
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -69,6 +71,7 @@ TxtBME680::TxtBME680(float sample_rate, float temp_offset)
 
 TxtBME680::~TxtBME680() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "", 0);
+	spdlog::get("file_logger")->trace("", 0);
 	if (m_running) {
 		exit();
 	}
@@ -77,6 +80,7 @@ TxtBME680::~TxtBME680() {
 
 int TxtBME680::init() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "", 0);
+	spdlog::get("file_logger")->trace("", 0);
 	uint32_t reti2c = InitI2C();
 	if (reti2c != 0) {
 		std::cout << "Error InitI2C: return " << reti2c << std::endl;
@@ -111,6 +115,7 @@ int TxtBME680::init() {
 
 int TxtBME680::exit() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "", 0);
+	spdlog::get("file_logger")->trace("", 0);
 	//stop
     assert(m_running == true);
     m_running = false;
@@ -120,6 +125,7 @@ int TxtBME680::exit() {
 
 void TxtBME680::run() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "",0);
+	spdlog::get("file_logger")->trace("",0);
 	//TODO
 	//printf("bsec_reset_output(BSEC_OUTPUT_IAQ_ESTIMATE)\r\n");
     //bsec_reset_output(BSEC_OUTPUT_IAQ_ESTIMATE);

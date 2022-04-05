@@ -28,6 +28,7 @@ TxtMultiProcessingStation::TxtMultiProcessingStation(TxtTransfer* pT, ft::TxtMqt
 	  reqQuit(false), reqVGRwp(0), reqVGRproduce(false), reqSLDstarted(false)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtMultiProcessingStation",0);
+	spdlog::get("file_logger")->trace("TxtMultiProcessingStation",0);
 	if (!calibData.existCalibFilename()) calibData.saveDefault();
 	calibData.load();
     configInputs();
@@ -36,11 +37,13 @@ TxtMultiProcessingStation::TxtMultiProcessingStation(TxtTransfer* pT, ft::TxtMqt
 TxtMultiProcessingStation::~TxtMultiProcessingStation()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtMultiProcessingStation",0);
+	spdlog::get("file_logger")->trace("~TxtMultiProcessingStation",0);
 }
 
 bool TxtMultiProcessingStation::isEndConveyorBeltTriggered()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "isEndConveyorBeltTriggered", 0);
+	spdlog::get("file_logger")->trace("isEndConveyorBeltTriggered", 0);
 	assert(pT->pTArea);
 	bool ret = (pT->pTArea->ftX1in.uni[3] != 1);
 	return ret;
@@ -48,6 +51,7 @@ bool TxtMultiProcessingStation::isEndConveyorBeltTriggered()
 
 void TxtMultiProcessingStation::setSawOff() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "setSawLeft",0);
+	spdlog::get("file_logger")->trace("setSawLeft", 0);
 	assert(pT->pTArea);
 	pT->pTArea->ftX1out.duty[chMsaw*2] = 0;
 	pT->pTArea->ftX1out.duty[chMsaw*2+1] = 0;
@@ -55,6 +59,7 @@ void TxtMultiProcessingStation::setSawOff() {
 
 void TxtMultiProcessingStation::setSawLeft() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "setSawLeft",0);
+	spdlog::get("file_logger")->trace("setSawLeft", 0);
 	assert(pT->pTArea);
 	pT->pTArea->ftX1out.duty[chMsaw*2] = 512;
 	pT->pTArea->ftX1out.duty[chMsaw*2+1] = 0;
@@ -63,6 +68,7 @@ void TxtMultiProcessingStation::setSawLeft() {
 void TxtMultiProcessingStation::setSawRight()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "setSawRight",0);
+	spdlog::get("file_logger")->trace("setSawRight", 0);
 	assert(pT->pTArea);
 	pT->pTArea->ftX1out.duty[chMsaw*2] = 0;
 	pT->pTArea->ftX1out.duty[chMsaw*2+1] = 512;
@@ -71,6 +77,7 @@ void TxtMultiProcessingStation::setSawRight()
 void TxtMultiProcessingStation::setValveEjection(bool on)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "setValveEjection {}", on);
+	spdlog::get("file_logger")->trace("setValveEjection {}", on);
 	assert(pT->pTArea);
 	pT->pTArea->ftX1out.duty[6] = on ? 512 : 0; // Switch on with PWM Value 512 (= max speed)
 }
@@ -78,6 +85,7 @@ void TxtMultiProcessingStation::setValveEjection(bool on)
 void TxtMultiProcessingStation::setCompressor(bool on)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "setCompressor {}", on);
+	spdlog::get("file_logger")->trace("setCompressor {}", on);
 	assert(pT->pTArea);
 	pT->pTArea->ftX1out.duty[7] = on ? 512 : 0; // Switch on with PWM Value 512 (= max speed)
 }
@@ -85,6 +93,7 @@ void TxtMultiProcessingStation::setCompressor(bool on)
 bool TxtMultiProcessingStation::isOvenTriggered()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "isOvenTriggered", 0);
+	spdlog::get("file_logger")->trace("isOvenTriggered", 0);
 	assert(pT->pTArea+1);
 	bool ret = ((pT->pTArea+1)->ftX1in.uni[4] != 1);
 	return ret;
@@ -93,6 +102,7 @@ bool TxtMultiProcessingStation::isOvenTriggered()
 void TxtMultiProcessingStation::setValveVacuum(bool on)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "setValveVacuum {}", on);
+	spdlog::get("file_logger")->trace("setValveVacuum {}", on);
 	assert(pT->pTArea+1);
 	(pT->pTArea+1)->ftX1out.duty[4] = on ? 512 : 0; // Switch on with PWM Value 512 (= max speed)
 }
@@ -100,6 +110,7 @@ void TxtMultiProcessingStation::setValveVacuum(bool on)
 void TxtMultiProcessingStation::setValveLowering(bool on)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "setValveLowering {}", on);
+	spdlog::get("file_logger")->trace("setValveLowering {}", on);
 	assert(pT->pTArea+1);
 	(pT->pTArea+1)->ftX1out.duty[5] = on ? 512 : 0; // Switch on with PWM Value 512 (= max speed)
 }
@@ -107,6 +118,7 @@ void TxtMultiProcessingStation::setValveLowering(bool on)
 void TxtMultiProcessingStation::setValveOvenDoor(bool on)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "setValveOvenDoor {}", on);
+	spdlog::get("file_logger")->trace("setValveOvenDoor {}", on);
 	assert(pT->pTArea+1);
 	(pT->pTArea+1)->ftX1out.duty[6] = on ? 512 : 0; // Switch on with PWM Value 512 (= max speed)
 }
@@ -114,6 +126,7 @@ void TxtMultiProcessingStation::setValveOvenDoor(bool on)
 void TxtMultiProcessingStation::setLightOven(bool on)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "setLightOven {}", on);
+	spdlog::get("file_logger")->trace("setLightOven {}", on);
 	assert(pT->pTArea+1);
 	(pT->pTArea+1)->ftX1out.duty[7] = on ? 512 : 0;
 }
@@ -121,6 +134,7 @@ void TxtMultiProcessingStation::setLightOven(bool on)
 void TxtMultiProcessingStation::configInputs()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "configInputs", 0);
+	spdlog::get("file_logger")->trace("configInputs", 0);
 	//master
 	assert(pT->pTArea);
 	//End Conveyor Belt

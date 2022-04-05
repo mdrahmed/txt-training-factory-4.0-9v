@@ -44,6 +44,7 @@ namespace ft {
 void TxtMultiProcessingStation::fsmStep()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "fsmStep",0);
+	spdlog::get("file_logger")->trace("fsmStep",0);
 
 	// Entry activities ===============================================
 	if( newState != currentState )
@@ -302,6 +303,7 @@ void TxtMultiProcessingStation::fsmStep()
 void TxtMultiProcessingStation::run()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "run",0);
+	spdlog::get("file_logger")->trace("run",0);
 	assert(mqttclient);
 	obs_mpo = new TxtMultiProcessingStationObserver(this, mqttclient);
 

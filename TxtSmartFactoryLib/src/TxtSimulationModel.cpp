@@ -21,6 +21,7 @@ TxtSimulationModel::TxtSimulationModel(TxtTransfer* pT, ft::TxtMqttFactoryClient
 	  m_stoprequested(false), m_running(false), m_mutex(), m_thread()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtSimulationModel",0);
+	spdlog::get("file_logger")->trace("TxtSimulationModel",0);
 	pthread_mutexattr_t attr;
 	pthread_mutexattr_init(&attr);
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -30,12 +31,14 @@ TxtSimulationModel::TxtSimulationModel(TxtTransfer* pT, ft::TxtMqttFactoryClient
 TxtSimulationModel::~TxtSimulationModel()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtSimulationModel",0);
+	spdlog::get("file_logger")->trace("~TxtSimulationModel",0);
 	if (m_running) stopThread();
 	pthread_mutex_destroy(&m_mutex);
 }
 
 bool TxtSimulationModel::startThread() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "start",0);
+	spdlog::get("file_logger")->trace("start",0);
 	//go
 	assert(m_running == false);
 	m_running = true;
@@ -44,6 +47,7 @@ bool TxtSimulationModel::startThread() {
 
 bool TxtSimulationModel::stopThread() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "stop",0);
+	spdlog::get("file_logger")->trace("stop",0);
 	//stop
 	assert(m_running == true);
 	m_running = false;

@@ -18,6 +18,7 @@ TxtJoystickXYBController::TxtJoystickXYBController(TxtTransfer* pT, uint8_t chX1
 	jd(), m_stoprequested(false), m_running(false), m_mutex(), m_thread()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtJoystickXYBController chX1,chY1,B1,chX2,chY2,B2:{} {} {} {} {} {}", chX1, chY1, chB1, chX2, chY2, chB2);
+	spdlog::get("file_logger")->trace("TxtJoystickXYBController chX1,chY1,B1,chX2,chY2,B2:{} {} {} {} {} {}", chX1, chY1, chB1, chX2, chY2, chB2);
 	pthread_mutexattr_t attr;
 	pthread_mutexattr_init(&attr);
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -27,12 +28,14 @@ TxtJoystickXYBController::TxtJoystickXYBController(TxtTransfer* pT, uint8_t chX1
 TxtJoystickXYBController::~TxtJoystickXYBController()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"),"~TxtJoystickXYBController",0);
+	spdlog::get("file_logger")->trace("~TxtJoystickXYBController",0);
 	if (m_running) stopThread();
 	pthread_mutex_destroy(&m_mutex);
 }
 
 bool TxtJoystickXYBController::startThread() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "start",0);
+	spdlog::get("file_logger")->trace("start",0);
 	//go
 	assert(m_running == false);
 	m_running = true;
@@ -41,6 +44,7 @@ bool TxtJoystickXYBController::startThread() {
 
 bool TxtJoystickXYBController::stopThread() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "stop",0);
+	spdlog::get("file_logger")->trace("stop",0);
 	//stop
 	assert(m_running == true);
 	m_running = false;
@@ -51,6 +55,7 @@ bool TxtJoystickXYBController::stopThread() {
 void TxtJoystickXYBController::configInputs()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "configInputs", 0);
+	spdlog::get("file_logger")->trace("configInputs", 0);
 	assert(pT->pTArea);
 	pT->pTArea->ftX1config.uni[chX1].mode = MODE_U;
 	pT->pTArea->ftX1config.uni[chX1].digital = 0;
@@ -94,6 +99,7 @@ double curve_func(double x) {
 
 void TxtJoystickXYBController::run() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "run",0);
+	spdlog::get("file_logger")->trace("TxtJoystickXYBController run", 0);
 	configInputs();
 
 	const int min_u = center0-delta0;

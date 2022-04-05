@@ -51,6 +51,7 @@ TxtDeliveryPickupStation::TxtDeliveryPickupStation(TxtTransfer* pT, ft::TxtMqttF
 	lastColorValue(0), activeDSI(false), activeDSO(false), errorDSI(false), errorDSO(false)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtDeliveryPickupStation",0);
+	spdlog::get("file_logger")->trace("TxtDeliveryPickupStation",0);
 	if (!calibData.existCalibFilename()) calibData.saveDefault();
 	calibData.load();
     //sound.enable(calibData.sound_enable); //see VGR
@@ -61,11 +62,13 @@ TxtDeliveryPickupStation::TxtDeliveryPickupStation(TxtTransfer* pT, ft::TxtMqttF
 TxtDeliveryPickupStation::~TxtDeliveryPickupStation()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtDeliveryPickupStation",0);
+	spdlog::get("file_logger")->trace("~TxtDeliveryPickupStation",0);
 }
 
 std::string TxtDeliveryPickupStation::nfcDeviceDeleteWriteRawRead(ft::TxtWPType_t c, std::vector<int64_t> vts, uint8_t mask_ts)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveNFCDeviceDeleteWriteRawRead", 0);
+	spdlog::get("file_logger")->trace("moveNFCDeviceDeleteWriteRawRead", 0);
 	nfcDelete();
 	TxtWorkpiece wp("", c, WP_STATE_RAW);
 	nfcWrite(wp, vts, mask_ts);
@@ -76,6 +79,7 @@ std::string TxtDeliveryPickupStation::nfcDeviceDeleteWriteRawRead(ft::TxtWPType_
 std::string TxtDeliveryPickupStation::nfcDeviceWriteProducedRead(ft::TxtWPType_t c, std::vector<int64_t> vts, uint8_t mask_ts)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveNFCDeviceWriteProducedRead", 0);
+	spdlog::get("file_logger")->trace("moveNFCDeviceWriteProducedRead", 0);
 	TxtWorkpiece wp("", c, WP_STATE_PROCESSED);
 	nfcWrite(wp, vts, mask_ts);
 	std::string sid = nfcRead();
@@ -85,6 +89,7 @@ std::string TxtDeliveryPickupStation::nfcDeviceWriteProducedRead(ft::TxtWPType_t
 std::string TxtDeliveryPickupStation::nfcDeviceWriteRejectedRead(ft::TxtWPType_t c, std::vector<int64_t> vts, uint8_t mask_ts)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveNFCDeviceWriteRejectedRead", 0);
+	spdlog::get("file_logger")->trace("moveNFCDeviceWriteRejectedRead", 0);
 	nfcDelete();
 	TxtWorkpiece wp("", c, WP_STATE_REJECTED);
 	nfcWrite(wp, vts, mask_ts);
@@ -95,6 +100,7 @@ std::string TxtDeliveryPickupStation::nfcDeviceWriteRejectedRead(ft::TxtWPType_t
 void TxtDeliveryPickupStation::configInputs()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "configInputs", 0);
+	spdlog::get("file_logger")->trace("configInputs", 0);
 	assert(pT->pTArea);
 	//DIN
 	pT->pTArea->ftX1config.uni[6].mode = MODE_R; // Digital Switch with PullUp resistor
@@ -117,6 +123,7 @@ void TxtDeliveryPickupStation::configInputs()
 bool TxtDeliveryPickupStation::is_DIN()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "is_DIN", 0);
+	spdlog::get("file_logger")->trace("is_DIN", 0);
 	assert(pT->pTArea);
 	return (pT->pTArea->ftX1in.uni[6] == 1);
 }
@@ -124,6 +131,7 @@ bool TxtDeliveryPickupStation::is_DIN()
 bool TxtDeliveryPickupStation::is_DOUT()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "is_DOUT", 0);
+	spdlog::get("file_logger")->trace("is_DOUT", 0);
 	assert(pT->pTArea);
 	return (pT->pTArea->ftX1in.cnt_in[3] == 1);
 }
@@ -131,6 +139,7 @@ bool TxtDeliveryPickupStation::is_DOUT()
 int TxtDeliveryPickupStation::readColorValue()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "getColorValue", 0);
+	spdlog::get("file_logger")->trace("getColorValue", 0);
 	assert(pT->pTArea);
 	lastColorValue = pT->pTArea->ftX1in.uni[7];
 	return lastColorValue;
@@ -139,6 +148,7 @@ int TxtDeliveryPickupStation::readColorValue()
 ft::TxtWPType_t TxtDeliveryPickupStation::getLastColor()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "getColor", 0);
+	spdlog::get("file_logger")->trace("getColor", 0);
 	if ((lastColorValue >= 200)&&(lastColorValue < calibData.color_th[0]))
 	{
 		return WP_TYPE_WHITE;
@@ -157,6 +167,7 @@ ft::TxtWPType_t TxtDeliveryPickupStation::getLastColor()
 bool TxtDeliveryPickupStation::nfcDelete()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "nfcDelete", 0);
+	spdlog::get("file_logger")->trace("nfcDelete", 0);
 	bool suc = nfc.eraseTags();
 	if (!suc) return false;
 	std::string tag_uid = nfc.readTags();
@@ -167,6 +178,7 @@ bool TxtDeliveryPickupStation::nfcDelete()
 std::string TxtDeliveryPickupStation::nfcRead()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "nfcRead", 0);
+	spdlog::get("file_logger")->trace("nfcRead", 0);
 	sound.info1();
 	return nfc.readTags();
 }
@@ -174,6 +186,7 @@ std::string TxtDeliveryPickupStation::nfcRead()
 std::string TxtDeliveryPickupStation::nfcReadUID()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "nfcReadUID", 0);
+	spdlog::get("file_logger")->trace("nfcReadUID", 0);
 	//sound.info1();
 	return nfc.readTagsGetUID();
 }
@@ -181,6 +194,7 @@ std::string TxtDeliveryPickupStation::nfcReadUID()
 bool TxtDeliveryPickupStation::nfcWrite(TxtWorkpiece wp, std::vector<int64_t> vts, uint8_t mask_ts)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "nfcWrite {} {} {}", wp.state, wp.type, vts.size());
+	spdlog::get("file_logger")->trace("nfcWrite {} {} {}", wp.state, wp.type, vts.size());
 	std::vector<uTS> vuTS;
 	for(unsigned int i = 0; i < vts.size(); i++)
 	{
@@ -195,6 +209,7 @@ bool TxtDeliveryPickupStation::nfcWrite(TxtWorkpiece wp, std::vector<int64_t> vt
 void TxtDeliveryPickupStation::run()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "run",0);
+	spdlog::get("file_logger")->trace("run",0);
 	while (!m_stoprequested)
 	{
 		if (reqUpdateDIN)

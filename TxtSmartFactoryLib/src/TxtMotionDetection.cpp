@@ -16,6 +16,7 @@ TxtMotionDetection::TxtMotionDetection(ft::TxtCamera* cam, double max_limit_Area
 	  m_stoprequested(false), m_running(false), m_mutex(), m_thread()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "max_limit_Area:{}", max_limit_Area);
+	spdlog::get("file_logger")->trace("max_limit_Area:{}", max_limit_Area);
 	pthread_mutexattr_t attr;
 	pthread_mutexattr_init(&attr);
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -25,6 +26,7 @@ TxtMotionDetection::TxtMotionDetection(ft::TxtCamera* cam, double max_limit_Area
 TxtMotionDetection::~TxtMotionDetection()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "");
+	spdlog::get("file_logger")->trace("");
 	if (m_running) {
 		stopThread();
 	}
@@ -33,11 +35,13 @@ TxtMotionDetection::~TxtMotionDetection()
 
 bool TxtMotionDetection::init() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "");
+	spdlog::get("file_logger")->trace("");
 	return true;
 }
 
 bool TxtMotionDetection::startThread() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "");
+	spdlog::get("file_logger")->trace("");
 	if (m_running) return true; //already running
 	/*if (!init()) {
     	return false;
@@ -61,6 +65,7 @@ bool TxtMotionDetection::startThread() {
 
 bool TxtMotionDetection::stopThread() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "");
+	spdlog::get("file_logger")->trace("");
 	if (!m_running) return true; //already stopped
 	//stop
     assert(m_running == true);
@@ -71,12 +76,14 @@ bool TxtMotionDetection::stopThread() {
 
 std::string TxtMotionDetection::getDataString() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "");
+	spdlog::get("file_logger")->trace("");
 	assert(cam);
 	return cam->getDataString();
 }
 
 void TxtMotionDetection::run() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "");
+	spdlog::get("file_logger")->trace("");
     while (!m_stoprequested)
     {
 		//pthread_mutex_lock(&m_mutex);

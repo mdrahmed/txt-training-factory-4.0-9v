@@ -21,6 +21,7 @@ namespace ft {
 bool TxtDeliveryPickupStationCalibData::load()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "loadCalib",0);
+	spdlog::get("file_logger")->trace("loadCalib",0);
 
     std::ifstream infile(filename.c_str());
     if ( infile.good())
@@ -61,6 +62,7 @@ bool TxtDeliveryPickupStationCalibData::load()
 bool TxtDeliveryPickupStationCalibData::saveDefault()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "saveDefault",0);
+	spdlog::get("file_logger")->trace("saveDefault",0);
     //white=450, red=1250, blue=1700
 	color_th[0] = 850;
 	color_th[1] = 1550;
@@ -75,6 +77,7 @@ bool TxtDeliveryPickupStationCalibData::saveDefault()
 bool TxtDeliveryPickupStationCalibData::save()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "save",0);
+	spdlog::get("file_logger")->trace("save",0);
 	Json::Value event;
 
     event["VGR"]["colorsens"]["th1"] = color_th[0];
@@ -95,6 +98,7 @@ bool TxtDeliveryPickupStationCalibData::save()
     if(!outputFileStream.is_open())
 	{
     	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "filename {} is not opened!",filename.c_str());
+	spdlog::get("file_logger")->trace("filename {} is not opened!",filename.c_str());
     	return false;
 	}
     return (writer->write(event, &outputFileStream) == 0);

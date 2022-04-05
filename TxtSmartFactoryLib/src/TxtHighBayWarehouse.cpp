@@ -29,6 +29,7 @@ TxtHighBayWarehouse::TxtHighBayWarehouse(TxtTransfer* pT, ft::TxtMqttFactoryClie
 	obs_hbw(0), obs_storage(0)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtHighBayWarehouse",0);
+	spdlog::get("file_logger")->trace("TxtHighBayWarehouse",0);
 	if (!calibData.existCalibFilename()) calibData.saveDefault();
 	calibData.load();
 }
@@ -36,6 +37,7 @@ TxtHighBayWarehouse::TxtHighBayWarehouse(TxtTransfer* pT, ft::TxtMqttFactoryClie
 TxtHighBayWarehouse::~TxtHighBayWarehouse()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtHighBayWarehouse",0);
+	spdlog::get("file_logger")->trace("~TxtHighBayWarehouse",0);
 	delete obs_hbw;
 	delete obs_storage;
 }
@@ -43,6 +45,7 @@ TxtHighBayWarehouse::~TxtHighBayWarehouse()
 void TxtHighBayWarehouse::stop()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "stop",0);
+	spdlog::get("file_logger")->trace("stop",0);
 	axisX.stop();
 	axisY.stop();
 	axisZ.stop();
@@ -51,6 +54,7 @@ void TxtHighBayWarehouse::stop()
 void TxtHighBayWarehouse::moveRef()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveRef",0);
+	spdlog::get("file_logger")->trace("moveRef",0);
 	setActStatus(true, SM_BUSY);
 	axisZ.moveS1();
 	std::thread tx = axisX.moveRefThread();
@@ -66,6 +70,7 @@ void TxtHighBayWarehouse::moveJoystick()
 	{
 		TxtJoysticksData jd = joyData;
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveJoystick 1:{} {} {} 2:{} {} {}", jd.aX1,jd.aY1,jd.b1,jd.aX2,jd.aY2,jd.b2);
+		spdlog::get("file_logger")->trace("moveJoystick 1:{} {} {} 2:{} {} {}", jd.aX1,jd.aY1,jd.b1,jd.aX2,jd.aY2,jd.b2);
 
 		int abs_X1 = abs(jd.aX1);
 		int abs_Y1 = abs(jd.aY1);
@@ -116,6 +121,7 @@ void TxtHighBayWarehouse::moveJoystick()
 EncPos2 TxtHighBayWarehouse::moveConv(bool stop)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveConv",0);
+	spdlog::get("file_logger")->trace("moveConv",0);
 	if (!stop)
 	{
 		axisZ.moveS1();
@@ -132,6 +138,7 @@ EncPos2 TxtHighBayWarehouse::moveConv(bool stop)
 EncPos2 TxtHighBayWarehouse::moveCR(int i, int j)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "moveCR idx:{} {}", i, j);
+	spdlog::get("file_logger")->trace("moveCR idx:{} {}", i, j);
 	axisZ.moveS1();
 	EncPos2 pos2;
 	pos2.x = calibData.hbx[i];
@@ -147,6 +154,7 @@ EncPos2 TxtHighBayWarehouse::moveCR(int i, int j)
 bool TxtHighBayWarehouse::getCR(int iCol, int iRow)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "getCR idx:{} {}", iCol, iRow);
+	spdlog::get("file_logger")->trace("getCR idx:{} {}", iCol, iRow);
 	EncPos2 p2 = moveCR(iCol,iRow);
 	axisZ.moveS2();
 	bool r = axisY.moveAbs(p2.y - ydelta);
@@ -157,6 +165,7 @@ bool TxtHighBayWarehouse::getCR(int iCol, int iRow)
 bool TxtHighBayWarehouse::putCR(int iCol, int iRow)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "putCR idx:{} {}", iCol, iRow);
+	spdlog::get("file_logger")->trace("putCR idx:{} {}", iCol, iRow);
 	EncPos2 p2 = moveCR(iCol,iRow);
 	//uint16_t posEndY = axisY.getPosEnd();
 	axisY.moveAbs(p2.y - ydelta);
@@ -169,6 +178,7 @@ bool TxtHighBayWarehouse::putCR(int iCol, int iRow)
 bool TxtHighBayWarehouse::getConv(bool stop)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "getConv",0);
+	spdlog::get("file_logger")->trace("getConv",0);
 	EncPos2 p2 = moveConv(stop);
 	axisZ.moveS2();
 	convBelt.moveIn();
@@ -183,6 +193,7 @@ bool TxtHighBayWarehouse::getConv(bool stop)
 bool TxtHighBayWarehouse::putConv(bool stop)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "putConv",0);
+	spdlog::get("file_logger")->trace("putConv",0);
 	EncPos2 p2 = moveConv();
 	axisZ.moveS2();
 	bool r = axisY.moveAbs(p2.y + ydelta);
@@ -197,6 +208,7 @@ bool TxtHighBayWarehouse::putConv(bool stop)
 bool TxtHighBayWarehouse::store(TxtWorkpiece wp)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "store {}", wp.type);
+	spdlog::get("file_logger")->trace("store {}", wp.type);
 	setActStatus(true, SM_BUSY);
 	if (storage.store(wp))
 	{
@@ -218,6 +230,7 @@ bool TxtHighBayWarehouse::store(TxtWorkpiece wp)
 bool TxtHighBayWarehouse::storeContainer()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "storeContainer",0);
+	spdlog::get("file_logger")->trace("storeContainer",0);
 	setActStatus(true, SM_BUSY);
 	if (storage.storeContainer())
 	{
@@ -239,6 +252,7 @@ bool TxtHighBayWarehouse::storeContainer()
 bool TxtHighBayWarehouse::fetch(TxtWPType_t t)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "fetch {}", t);
+	spdlog::get("file_logger")->trace("fetch {}", t);
 	setActStatus(true, SM_BUSY);
 	if (storage.fetch(t))
 	{
@@ -259,6 +273,7 @@ bool TxtHighBayWarehouse::fetch(TxtWPType_t t)
 bool TxtHighBayWarehouse::fetchContainer()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "fetchContainer", 0);
+	spdlog::get("file_logger")->trace("fetchContainer", 0);
 	setActStatus(true, SM_BUSY);
 	if (storage.fetchContainer())
 	{
@@ -287,12 +302,14 @@ bool TxtHighBayWarehouse::fetchContainer()
 bool TxtHighBayWarehouse::canColorBeStored(TxtWPType_t c)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "canColorBeStored {}", c);
+	spdlog::get("file_logger")->trace("canColorBeStored {}", c);
 	return storage.canColorBeStored(c);
 }
 
 void TxtHighBayWarehouse::setSpeed(int16_t s)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "setSpeed {}", s);
+	spdlog::get("file_logger")->trace("setSpeed {}", s);
 	axisX.setSpeed(s);
 	axisY.setSpeed(s);
 	axisZ.setSpeed(s);

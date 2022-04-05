@@ -81,12 +81,14 @@ class action_listener_subscribe : public virtual mqtt::iaction_listener
 {
 	void on_failure(const mqtt::token& tok) override {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "on_failure", 0);
+		spdlog::get("file_logger")->trace("on_failure", 0);
 		if (tok.get_message_id() != 0)
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  for token: [{}]", tok.get_message_id());
 	}
 
 	void on_success(const mqtt::token& tok) override {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "on_success", 0);
+		spdlog::get("file_logger")->trace("on_success", 0);
 		if (tok.get_message_id() != 0)
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  for token: [{}]", tok.get_message_id());
 		auto topics_ = tok.get_topics();
@@ -107,12 +109,14 @@ class action_listener_publish : public virtual mqtt::iaction_listener
 {
 	void on_failure(const mqtt::token& tok) override {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "on_failure", 0);
+		spdlog::get("file_logger")->trace("on_failure", 0);
 		if (tok.get_message_id() != 0)
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  for token: [{}]", tok.get_message_id());
 	}
 
 	void on_success(const mqtt::token& tok) override {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"), "on_success", 0);
+		spdlog::get("file_logger")->trace("on_success", 0);
 		if (tok.get_message_id() != 0)
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  for token: [{}]", tok.get_message_id());
 		auto topics_ = tok.get_topics();

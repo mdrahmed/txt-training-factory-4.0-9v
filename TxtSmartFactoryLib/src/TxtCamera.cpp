@@ -27,6 +27,7 @@ TxtCamera::TxtCamera(double w, double h) :
 	m_running(false), m_mutex(), m_thread()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "TxtCamera w:{} h:{}", w, h);
+	spdlog::get("file_logger")->trace("TxtCamera w:{} h:{}", w, h);
 	pthread_mutexattr_t attr;
 	pthread_mutexattr_init(&attr);
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -35,6 +36,7 @@ TxtCamera::TxtCamera(double w, double h) :
 
 TxtCamera::~TxtCamera() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "~TxtCamera");
+	spdlog::get("file_logger")->trace("~TxtCamera");
 	if (m_running) {
 		stop();
 	}
@@ -43,6 +45,7 @@ TxtCamera::~TxtCamera() {
 
 bool TxtCamera::init() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "init");
+	spdlog::get("file_logger")->trace("init");
 	bool ret = cap.open(0);
 	if (!ret) {
         std::cout << "error cap.open(0)" << std::endl;
@@ -80,6 +83,7 @@ bool TxtCamera::init() {
 
 bool TxtCamera::startThread() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "start");
+	spdlog::get("file_logger")->trace("start");
 	if (m_running) return true; //already running
 	if (!init()) {
     	return false;
@@ -103,6 +107,7 @@ bool TxtCamera::startThread() {
 
 bool TxtCamera::stopThread() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "stop");
+	spdlog::get("file_logger")->trace("stop");
 	if (!m_running) return true; //already stopped
 	//stop
     assert(m_running == true);
@@ -125,12 +130,14 @@ cv::Mat TxtCamera::getFrame() {
 
 void TxtCamera::run() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "run");
+	spdlog::get("file_logger")->trace("run");
     while (!m_stoprequested)
     {
     	if (doGrab)
     	{
             if (!cap.isOpened()) {
         		spdlog::get("console")->warn("cap.isOpened() == false. Will try to reopen capture.");
+			spdlog::get("file_logger")->warn("cap.isOpened() == false. Will try to reopen capture.");
             	if (!init()) {
                     std::cout << "error init" << std::endl;
             	}
@@ -138,6 +145,7 @@ void TxtCamera::run() {
 
 #ifdef CAM_TEST
     		spdlog::get("console")->info("CAM 0: --- get frame");
+		spdlog::get("file_logger")->info("CAM 0: --- get frame");
 #endif
     		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock run");
     		pthread_mutex_lock(&m_mutex);
@@ -165,6 +173,7 @@ void TxtCamera::run() {
 
 std::string TxtCamera::getDataString() {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "getDataString");
+	spdlog::get("file_logger")->trace("getDataString");
 	std::string s;
 	pthread_mutex_lock(&m_mutex);
 	if (!frame.empty()) {
@@ -172,6 +181,7 @@ std::string TxtCamera::getDataString() {
 		try {
 #ifdef CAM_TEST
 			spdlog::get("console")->info("CAM 1: --- imencode jpg");
+			spdlog::get("file_logger")->info("CAM 1: --- imencode jpg");
 #endif
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock getDataString");
 			ret = cv::imencode(".jpg", frame, buf);
@@ -184,6 +194,7 @@ std::string TxtCamera::getDataString() {
 			if (ret) {
 #ifdef CAM_TEST
 				spdlog::get("console")->info("CAM 2: --- base64_encode");
+				spdlog::get("file_logger")->info("CAM 2: --- base64_encode");
 #endif
 				s = "data:image/jpeg;base64," + base64_encode(buf.data(), buf.size());
 			}
@@ -195,6 +206,7 @@ std::string TxtCamera::getDataString() {
 
 bool TxtCamera::writeFile(const std::string& filename) {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "writeFile filename:{}", filename.c_str());
+	spdlog::get("file_logger")->trace("writeFile filename:{}", filename.c_str());
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock writeFile");
 	pthread_mutex_lock(&m_mutex);
 	bool ret = cv::imwrite(filename, frame);

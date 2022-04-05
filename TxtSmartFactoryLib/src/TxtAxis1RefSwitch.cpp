@@ -18,17 +18,20 @@ TxtAxis1RefSwitch::TxtAxis1RefSwitch(std::string name, TxtTransfer* pT, uint8_t 
 	: TxtAxis(name, pT, chM, chS1), pos(0), posEnd(posEnd)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{} TxtAxis1RefSwitch chM:{} chS1:{} posEnd:{}",name,chM,chS1,posEnd);
+	spdlog::get("file_logger")->trace("{} TxtAxis1RefSwitch chM:{} chS1:{} posEnd:{}",name,chM,chS1,posEnd);
 	configInputs(chS1);
 }
 
 TxtAxis1RefSwitch::~TxtAxis1RefSwitch()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{} ~TxtAxis1RefSwitch",name);
+	spdlog::get("file_logger")->trace("{} ~TxtAxis1RefSwitch",name);
 }
 
 void TxtAxis1RefSwitch::moveRef()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{} moveRef",name);
+	spdlog::get("file_logger")->trace("{} moveRef",name);
 
 	resetCounter();
 
@@ -104,6 +107,7 @@ void TxtAxis1RefSwitch::moveRef()
 
 bool TxtAxis1RefSwitch::moveAbs(uint16_t p) {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{} movePos p:{}",name,p);
+	spdlog::get("file_logger")->trace("{} movePos p:{}",name,p);
 	if (p > posEnd)
 	{
 		spdlog::get("console_axes")->error("{} Warning: p:{} > posEnd:{}",name,p,posEnd);
@@ -148,6 +152,7 @@ bool TxtAxis1RefSwitch::moveAbs(uint16_t p) {
 void TxtAxis1RefSwitch::setMotorRight()
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{}({}) setMotorRight",name,status);
+	spdlog::get("file_logger")->trace("{}({}) setMotorRight",name,status);
 	if (pos >= posEnd)
 	{
 		setMotorOff();
@@ -202,6 +207,7 @@ void TxtAxis1RefSwitch::moveLeft(uint16_t steps, uint16_t* p)
 {
 	assert(p!=NULL);
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{} moveLeft chM:{} chS1:{} steps:{} p:{}",name,chM,chS1,steps,*p);
+	spdlog::get("file_logger")->trace("{} moveLeft chM:{} chS1:{} steps:{} p:{}",name,chM,chS1,steps,*p);
 	if (steps <= 0) {
 		spdlog::get("console_axes")->warn("{} Warning: steps<=0. Exit function.",name);
 		return;
@@ -297,6 +303,7 @@ void TxtAxis1RefSwitch::moveLeft(uint16_t steps, uint16_t* p)
 void TxtAxis1RefSwitch::moveRight(uint16_t steps, uint16_t* p) {
 	assert(p!=NULL);
 	SPDLOG_LOGGER_TRACE(spdlog::get("console_axes"), "{} moveRight steps:{} p:{}",name,steps,*p);
+	spdlog::get("file_logger")->trace("{} moveRight steps:{} p:{}",name,steps,*p);
 	if (steps <= 0) {
 		spdlog::get("console_axes")->warn("{} Warning: steps<=0. Exit function.",name);
 		return;

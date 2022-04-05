@@ -19,12 +19,14 @@ namespace ft {
 void SubjectObserver::Attach (Observer* o)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "",0);
+	spdlog::get("file_logger")->trace("",0);
 	_observers.push_back(o);
 }
 
 void SubjectObserver::Detach (Observer* o)
 {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "",0);
+	spdlog::get("file_logger")->trace("",0);
 	int count = _observers.size();
 	int i;
 
