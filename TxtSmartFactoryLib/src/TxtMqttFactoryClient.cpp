@@ -99,6 +99,8 @@ TxtMqttFactoryClient::TxtMqttFactoryClient(std::string clientname, std::string h
 			sout_pos << js_pos;
 			try {
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "topic: {}", TOPIC_INPUT_PTUPOS);
+				spdlog::get("file_logger")->debug("topic: {}", TOPIC_INPUT_PTUPOS);
+				
 				mqtt::message willmsg_pos(TOPIC_INPUT_PTUPOS, sout_pos.str(), 1, true);
 				mqtt::will_options will_pos(willmsg_pos);
 				connOpts.set_will(will_pos);
@@ -118,6 +120,7 @@ TxtMqttFactoryClient::TxtMqttFactoryClient(std::string clientname, std::string h
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
 	pthread_mutex_init(&m_mutex, &attr);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_init",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_init",0);
 }
 
 TxtMqttFactoryClient::~TxtMqttFactoryClient() {
@@ -126,6 +129,7 @@ TxtMqttFactoryClient::~TxtMqttFactoryClient() {
 	disconnect(1000);
 	pthread_mutex_destroy(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_destroy",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_destroy",0);
 }
 
 bool TxtMqttFactoryClient::connect(long int timeout) {
@@ -134,6 +138,8 @@ bool TxtMqttFactoryClient::connect(long int timeout) {
 	try {
 		mqtt::token_ptr conntok = cli.connect(connOpts);
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "conntok->wait_for {}", timeout);
+		spdlog::get("file_logger")->debug("conntok->wait_for {}", timeout);
+	
 		return conntok->wait_for(timeout);
 	/*} catch (const mqtt::security_exception& exc) {
 		std::cout << "security_exception: " << exc.what() << std::endl;
@@ -162,8 +168,11 @@ void TxtMqttFactoryClient::disconnect(long int timeout) {
 	spdlog::get("file_logger")->trace("disconnect",0);
 	pthread_mutex_lock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock disconnect",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_lock disconnect",0);
+		
 	try {
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "unsubscribe",0);
+	spdlog::get("file_logger")->debug("unsubscribe",0);
 
 		if (clientname == "TxtFactoryMain")
 		{
@@ -221,6 +230,7 @@ void TxtMqttFactoryClient::disconnect(long int timeout) {
 		else
 		{
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "Error: unknown name: {}",clientname);
+			spdlog::get("file_logger")->debug("Error: unknown name: {}",clientname);
 			exit(1);
 		}
 
@@ -229,6 +239,7 @@ void TxtMqttFactoryClient::disconnect(long int timeout) {
 		//cli.stop_consuming();
 
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "disconnect",0);
+			spdlog::get("file_logger")->debug("disconnect",0);
 		mqtt::token_ptr conntok = cli.disconnect();
 		bool r = conntok->wait_for(timeout);
 #ifdef FORCE_EXIT_ON_TIMEOUT
@@ -241,11 +252,13 @@ void TxtMqttFactoryClient::disconnect(long int timeout) {
 	}
 	pthread_mutex_unlock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock disconnect",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_unlock disconnect",0);
 }
 
 void TxtMqttFactoryClient::subTopic(const std::string& topicFilter, long int timeout)
 {
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "topic: {}", topicFilter);
+	spdlog::get("file_logger")->debug("topic: {}", topicFilter);
 	mqtt::token_ptr conntok_link = cli.subscribe(topicFilter, 1, nullptr, aListSub);
 	/*bool rc_link = conntok_link->wait_for(timeout);
 	if (!rc_link) {
@@ -258,6 +271,8 @@ bool TxtMqttFactoryClient::start_consume(long int timeout) {
 	spdlog::get("file_logger")->trace("start_consume",0);
 	pthread_mutex_lock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock start_consume",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_lock start_consume",0);
+	
 	bool ret = false;
 	try {
 
@@ -267,6 +282,7 @@ bool TxtMqttFactoryClient::start_consume(long int timeout) {
 
 		//subscribe
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "subscribe",0);
+		spdlog::get("file_logger")->debug("subscribe",0);
 		//cli.subscribe("#", 1, nullptr, aListSub);
 
 		if (clientname == "TxtFactoryMain")
@@ -325,6 +341,7 @@ bool TxtMqttFactoryClient::start_consume(long int timeout) {
 		else
 		{
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "Error: unknown name: {}",clientname);
+			spdlog::get("file_logger")->debug("Error: unknown name: {}",clientname);
 			exit(1);
 		}
 
@@ -335,6 +352,8 @@ bool TxtMqttFactoryClient::start_consume(long int timeout) {
 	}
 	pthread_mutex_unlock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock start_consume",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_unlock start_consume",0);
+	
 	return ret;
 }
 
@@ -343,6 +362,7 @@ void TxtMqttFactoryClient::publishLDR(double timestamp_s, int16_t ldr, long time
 	spdlog::get("file_logger")->trace("publishLDR ldr:{} timeout:{}", ldr, timeout);
 	pthread_mutex_lock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock publishLDR",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_lock publishLDR",0);
 	if ((ldr < 0)||(ldr > 15000)) {
 		std::cout << "Warning: LDR raw value out of range!" << std::endl;
 	}
@@ -359,10 +379,14 @@ void TxtMqttFactoryClient::publishLDR(double timestamp_s, int16_t ldr, long time
 		sout_ldr << js_ldr;
 		try {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "topic: {}", TOPIC_INPUT_LDR);
+			spdlog::get("file_logger")->debug("topic: {}", TOPIC_INPUT_LDR);
+			
 			auto msg_sldr = mqtt::make_message(TOPIC_INPUT_LDR, sout_ldr.str());//sldr.c_str());
 			msg_sldr->set_qos(iqos);
 			msg_sldr->set_retained(bretained);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "publish ldr: {} ldr:{} br:{}", sts, ldr, br);
+			spdlog::get("file_logger")->debug("publish ldr: {} ldr:{} br:{}", sts, ldr, br);
+			
 			mqtt::token_ptr conntok = cli.publish(msg_sldr, nullptr, aListPub);
 			bool r = conntok->wait_for(timeout);
 #ifdef FORCE_EXIT_ON_TIMEOUT
@@ -377,6 +401,7 @@ void TxtMqttFactoryClient::publishLDR(double timestamp_s, int16_t ldr, long time
 	}
 	pthread_mutex_unlock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock publishLDR",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_unlock publishLDR",0);
 }
 
 void TxtMqttFactoryClient::publishPtuPos(float pan, float tilt, long timeout) {
@@ -384,6 +409,8 @@ void TxtMqttFactoryClient::publishPtuPos(float pan, float tilt, long timeout) {
 	spdlog::get("file_logger")->trace("publishPtuPos pan:{} tilt:{} timeout:{}", pan, tilt, timeout);
 	pthread_mutex_lock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock publishPtuPos",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_lock publishPtuPos",0);
+	
 	char sts[25];
 	ft::getnowstr(sts);
 	Json::Value js_pos;
@@ -395,10 +422,13 @@ void TxtMqttFactoryClient::publishPtuPos(float pan, float tilt, long timeout) {
 		sout_pos << js_pos;
 		try {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "topic: {}", TOPIC_INPUT_PTUPOS);
+			spdlog::get("file_logger")->debug("topic: {}", TOPIC_INPUT_PTUPOS);
 			auto msg_spos = mqtt::make_message(TOPIC_INPUT_PTUPOS, sout_pos.str());//spos.c_str());
 			msg_spos->set_qos(iqos);
 			msg_spos->set_retained(bretained);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "publish PTU pos: {} {} {}", sts, pan, tilt);
+			spdlog::get("file_logger")->debug("publish PTU pos: {} {} {}", sts, pan, tilt);
+			
 			mqtt::token_ptr conntok = cli.publish(msg_spos, nullptr, aListPub);
 			bool r = conntok->wait_for(timeout);
 #ifdef FORCE_EXIT_ON_TIMEOUT
@@ -413,6 +443,7 @@ void TxtMqttFactoryClient::publishPtuPos(float pan, float tilt, long timeout) {
 	}
 	pthread_mutex_unlock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock publishPtuPos",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_unlock publishPtuPos",0);
 }
 
 void TxtMqttFactoryClient::publishCam(const std::string sdata, long timeout) {
@@ -420,6 +451,8 @@ void TxtMqttFactoryClient::publishCam(const std::string sdata, long timeout) {
 	spdlog::get("file_logger")->trace("publishCam timeout:{}",timeout);
 	pthread_mutex_lock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock publishCam",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_lock publishCam",0);
+	
 	char sts[25];
 	ft::getnowstr(sts);
 	Json::Value js_cam;
@@ -430,10 +463,14 @@ void TxtMqttFactoryClient::publishCam(const std::string sdata, long timeout) {
 		sout_cam << js_cam;
 		try {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "topic: {}", TOPIC_INPUT_CAM);
+			spdlog::get("file_logger")->debug("topic: {}", TOPIC_INPUT_CAM);
+			
 			auto msg_im = mqtt::make_message(TOPIC_INPUT_CAM, sout_cam.str());//sim.c_str());
 			msg_im->set_qos(0);
 			msg_im->set_retained(bretained);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "publish Cam: {}", sts);
+			spdlog::get("file_logger")->debug("publish Cam: {}", sts);
+			
 			mqtt::token_ptr conntok = cli.publish(msg_im, nullptr, aListPub);
 			bool r = conntok->wait_for(timeout);
 #ifdef FORCE_EXIT_ON_TIMEOUT
@@ -448,6 +485,7 @@ void TxtMqttFactoryClient::publishCam(const std::string sdata, long timeout) {
 	}
 	pthread_mutex_unlock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock publishCam",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_unlock publishCam",0);
 }
 
 void TxtMqttFactoryClient::publishBme680(int64_t timestamp, float iaq, uint8_t iaq_accuracy, float temperature, float humidity,
@@ -462,6 +500,8 @@ void TxtMqttFactoryClient::publishBme680(int64_t timestamp, float iaq, uint8_t i
 			pressure,raw_temperature,raw_humidity,gas,timeout);
 	pthread_mutex_lock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock publishBme680",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_lock publishBme680",0); 
+	
 	char sts[25];
 	ft::gettimestampstr(timestamp, sts);
 	Json::Value js_bme680;
@@ -479,6 +519,7 @@ void TxtMqttFactoryClient::publishBme680(int64_t timestamp, float iaq, uint8_t i
 		sout_bme680 << js_bme680;
 		try {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "topic: {}", TOPIC_INPUT_BME680);
+			spdlog::get("file_logger")->debug("topic: {}", TOPIC_INPUT_BME680);
 			auto msg_bme680 = mqtt::make_message(TOPIC_INPUT_BME680, sout_bme680.str());//sbme680);
 			msg_bme680->set_qos(iqos);
 			msg_bme680->set_retained(bretained);
@@ -487,7 +528,16 @@ void TxtMqttFactoryClient::publishBme680(int64_t timestamp, float iaq, uint8_t i
 					ft::ftos(humidity, 1), ft::ftos(raw_humidity, 2),
 					ft::ftos(pressure/100, 1), ft::ftos(iaq, 0),
 					iaq_accuracy, ft::ftos(gas, 0));
+
+			spdlog::get("file_logger")->debug("publish BME680: {} {} {} {} {} {} {} {} {}",
+					sts, ft::ftos(temperature, 1), ft::ftos(raw_temperature, 2),
+					ft::ftos(humidity, 1), ft::ftos(raw_humidity, 2),
+					ft::ftos(pressure/100, 1), ft::ftos(iaq, 0),
+					iaq_accuracy, ft::ftos(gas, 0));
+					
+			
 			mqtt::token_ptr conntok = cli.publish(msg_bme680, nullptr, aListPub);
+			
 			bool r = conntok->wait_for(timeout);
 #ifdef FORCE_EXIT_ON_TIMEOUT
 			if (!r) exit(1);
@@ -501,6 +551,7 @@ void TxtMqttFactoryClient::publishBme680(int64_t timestamp, float iaq, uint8_t i
 	}
 	pthread_mutex_unlock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock publishBme680",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_unlock publishBme680",0);
 }
 
 void TxtMqttFactoryClient::publishAlert(bool st, const std::string id, const std::string sdata, int code, long timeout)
@@ -511,6 +562,8 @@ void TxtMqttFactoryClient::publishAlert(bool st, const std::string id, const std
 			id,code,timeout);
 	pthread_mutex_lock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock publishAlert",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_lock publishAlert",0);
+	
 	Json::Value js_alert;
 	std::ostringstream sout_alert;
 	char sts[25];
@@ -527,10 +580,14 @@ void TxtMqttFactoryClient::publishAlert(bool st, const std::string id, const std
 		sout_alert << js_alert;
 		try {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "topic: {}", TOPIC_INPUT_ALERT);
+			spdlog::get("file_logger")->debug("topic: {}", TOPIC_INPUT_ALERT);
+			
 			auto msg_alert = mqtt::make_message(TOPIC_INPUT_ALERT, sout_alert.str());
 			msg_alert->set_qos(iqos);
 			msg_alert->set_retained(bretained);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "publish Alert: {} {} {}", sts, id, code);
+			spdlog::get("file_logger")->debug("publish Alert: {} {} {}", sts, id, code);
+			
 			mqtt::token_ptr conntok = cli.publish(msg_alert, nullptr, aListPub);
 			bool r = conntok->wait_for(timeout);
 #ifdef FORCE_EXIT_ON_TIMEOUT
@@ -545,6 +602,7 @@ void TxtMqttFactoryClient::publishAlert(bool st, const std::string id, const std
 	}
 	pthread_mutex_unlock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock publishAlert",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_unlock publishAlert",0);
 }
 
 std::string getMAC(const char* sdev)
@@ -562,6 +620,8 @@ std::string getMAC(const char* sdev)
         sprintf(&MAC_str[i*2],"%02X",((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
     MAC_str[12]='\0';
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "MAC_str {}",MAC_str);
+	spdlog::get("file_logger")->debug("MAC_str {}",MAC_str);
+	
     return std::string(MAC_str);
 }
 
@@ -573,6 +633,8 @@ void TxtMqttFactoryClient::publishBroadcast(double timestamp_s, const std::strin
 			timestamp_s,ver,message, timeout);
 	pthread_mutex_lock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock publishBroadcast",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_lock publishBroadcast",0);
+	
 	Json::Value js_broadcast;
 	std::ostringstream sout_broadcast;
 	char sts[25];
@@ -588,12 +650,18 @@ void TxtMqttFactoryClient::publishBroadcast(double timestamp_s, const std::strin
 		js_broadcast["message"] = message;
 		sout_broadcast << js_broadcast;
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "str: {}",sout_broadcast.str());
+		spdlog::get("file_logger")->debug("str: {}",sout_broadcast.str());
+		
 		try {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "topic: {}", TOPIC_INPUT_BROADCAST);
+			spdlog::get("file_logger")->debug("topic: {}", TOPIC_INPUT_BROADCAST);
+			
 			auto msg_broadcast = mqtt::make_message(TOPIC_INPUT_BROADCAST, sout_broadcast.str());
 			msg_broadcast->set_qos(iqos);
 			msg_broadcast->set_retained(bretained);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "publish Broadcast: {}", sts);
+			spdlog::get("file_logger")->debug("publish Broadcast: {}", sts);
+			
 			mqtt::token_ptr conntok = cli.publish(msg_broadcast, nullptr, aListPub);
 			bool r = conntok->wait_for(timeout);
 #ifdef FORCE_EXIT_ON_TIMEOUT
@@ -608,6 +676,7 @@ void TxtMqttFactoryClient::publishBroadcast(double timestamp_s, const std::strin
 	}
 	pthread_mutex_unlock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock publishBroadcast",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_unlock publishBroadcast",0);
 }
 
 void TxtMqttFactoryClient::publishStateStation(const std::string station, TxtLEDSCode_t code, const std::string desc, long timeout, int active, const std::string target)
@@ -616,6 +685,7 @@ void TxtMqttFactoryClient::publishStateStation(const std::string station, TxtLED
 	spdlog::get("file_logger")->trace("publishStateStation station:{} code:{} desc:{} timeout:{} active:{} target:{}", station, (int)code, desc, timeout, active, target);
 	pthread_mutex_lock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock publishStateStation",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_lock publishStateStation",0);
 	Json::Value js_stateStation;
 	std::ostringstream sout_stateStation;
 	char sts[25];
@@ -638,10 +708,14 @@ void TxtMqttFactoryClient::publishStateStation(const std::string station, TxtLED
 			{
 				mqtt::string topic = TOPIC_INPUT_STATE_ + station;
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "topic: {}", topic);
+				spdlog::get("file_logger")->debug("topic: {}", topic);
+				
 				auto msg_stateStation = mqtt::make_message(topic, sout_stateStation.str());
 				msg_stateStation->set_qos(iqos);
 				msg_stateStation->set_retained(bretained);
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "publish state station: {} {} {} {} {} {}", sts, station, (int)code, desc, active, target);
+				spdlog::get("file_logger")->debug("publish state station: {} {} {} {} {} {}", sts, station, (int)code, desc, active, target);
+				
 				mqtt::token_ptr conntok = cli.publish(msg_stateStation, nullptr, aListPub);
 				bool r = conntok->wait_for(timeout);
 #ifdef FORCE_EXIT_ON_TIMEOUT
@@ -657,6 +731,7 @@ void TxtMqttFactoryClient::publishStateStation(const std::string station, TxtLED
 	}
 	pthread_mutex_unlock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock publishStateStation",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_unlock publishStateStation",0);
 }
 
 void TxtMqttFactoryClient::publishStock(Stock_map_t map_wps, long timeout)
@@ -665,6 +740,7 @@ void TxtMqttFactoryClient::publishStock(Stock_map_t map_wps, long timeout)
 	spdlog::get("file_logger")->trace("publishStock timeout:{}", timeout);
 	pthread_mutex_lock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock publishStock",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_lock publishStock",0);
 	Json::Value js_stock;
 	std::ostringstream sout_stock;
 	char sts[25];
@@ -699,11 +775,15 @@ void TxtMqttFactoryClient::publishStock(Stock_map_t map_wps, long timeout)
 		sout_stock << js_stock;
 		try {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "topic: {}", TOPIC_INPUT_STOCK);
+			spdlog::get("file_logger")->debug("topic: {}", TOPIC_INPUT_STOCK);
+			
 			auto msg_stock = mqtt::make_message(TOPIC_INPUT_STOCK, sout_stock.str());
 			//printf("%s", sout_stock.str().c_str());
 			msg_stock->set_qos(iqos);
 			msg_stock->set_retained(bretained);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "publish stock: {} {}", sts, jsonArray.size());
+			spdlog::get("file_logger")->debug("publish stock: {} {}", sts, jsonArray.size());
+			
 			mqtt::token_ptr conntok = cli.publish(msg_stock, nullptr, aListPub);
 			bool r = conntok->wait_for(timeout);
 #ifdef FORCE_EXIT_ON_TIMEOUT
@@ -718,6 +798,7 @@ void TxtMqttFactoryClient::publishStock(Stock_map_t map_wps, long timeout)
 	}
 	pthread_mutex_unlock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock publishStock",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_unlock publishStock",0);
 }
 
 void TxtMqttFactoryClient::publishStateOrder(TxtOrderState ord_state, long timeout)
@@ -726,6 +807,8 @@ void TxtMqttFactoryClient::publishStateOrder(TxtOrderState ord_state, long timeo
 	spdlog::get("file_logger")->trace("publishOrder timeout:{}", timeout);
 	pthread_mutex_lock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock publishOrder",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_lock publishOrder",0);
+	
 	Json::Value js_order;
 	std::ostringstream sout_order;
 	char sts[25];
@@ -737,10 +820,13 @@ void TxtMqttFactoryClient::publishStateOrder(TxtOrderState ord_state, long timeo
 		sout_order << js_order;
 		try {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "topic: {}", TOPIC_INPUT_STATE_ORDER);
+			spdlog::get("file_logger")->debug("topic: {}", TOPIC_INPUT_STATE_ORDER);
 			auto msg_order = mqtt::make_message(TOPIC_INPUT_STATE_ORDER, sout_order.str());
 			msg_order->set_qos(iqos);
 			msg_order->set_retained(bretained);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "publish state order: {} {} {}", sts, toString(ord_state.state), toString(ord_state.type));
+			spdlog::get("file_logger")->debug("publish state order: {} {} {}", sts, toString(ord_state.state), toString(ord_state.type));
+			
 			mqtt::token_ptr conntok = cli.publish(msg_order, nullptr, aListPub);
 			bool r = conntok->wait_for(timeout);
 #ifdef FORCE_EXIT_ON_TIMEOUT
@@ -755,6 +841,7 @@ void TxtMqttFactoryClient::publishStateOrder(TxtOrderState ord_state, long timeo
 	}
 	pthread_mutex_unlock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock publishOrder",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_unlock publishOrder",0);
 }
 
 void TxtMqttFactoryClient::publishNfcDS(TxtWorkpiece wp, History_map_t map_hist, long timeout)
@@ -763,6 +850,7 @@ void TxtMqttFactoryClient::publishNfcDS(TxtWorkpiece wp, History_map_t map_hist,
 	spdlog::get("file_logger")->trace("publishNfcDS timeout:{}", timeout);
 	pthread_mutex_lock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock publishNfcDS",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_lock publishNfcDS",0);
 	Json::Value js_nfcDS;
 	std::ostringstream sout_nfcDS;
 	char sts[25];
@@ -793,10 +881,12 @@ void TxtMqttFactoryClient::publishNfcDS(TxtWorkpiece wp, History_map_t map_hist,
 		sout_nfcDS << js_nfcDS;
 		try {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "topic: {}", TOPIC_INPUT_NFC_DS);
+			spdlog::get("file_logger")->debug("topic: {}", TOPIC_INPUT_NFC_DS);
 			auto msg_nfcDS = mqtt::make_message(TOPIC_INPUT_NFC_DS, sout_nfcDS.str());
 			msg_nfcDS->set_qos(iqos);
 			msg_nfcDS->set_retained(bretained);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "publish NFC DS: {}", sts);
+			spdlog::get("file_logger")->debug("publish NFC DS: {}", sts);
 			mqtt::token_ptr conntok = cli.publish(msg_nfcDS, nullptr, aListPub);
 			bool r = conntok->wait_for(timeout);
 #ifdef FORCE_EXIT_ON_TIMEOUT
@@ -811,6 +901,7 @@ void TxtMqttFactoryClient::publishNfcDS(TxtWorkpiece wp, History_map_t map_hist,
 	}
 	pthread_mutex_unlock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock publishNfcDS",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_unlock publishNfcDS",0);
 }
 
 void TxtMqttFactoryClient::publishStationBroadcast(const std::string station, double timestamp_s, const std::string sw, const std::string ver, const std::string message, long timeout)
@@ -821,6 +912,7 @@ void TxtMqttFactoryClient::publishStationBroadcast(const std::string station, do
 			station, timestamp_s, ver, message, timeout);
 	pthread_mutex_lock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock publishStationBroadcast",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_lock publishStationBroadcast",0);
 	Json::Value js_broadcast;
 	std::ostringstream sout_broadcast;
 	char sts[25];
@@ -836,12 +928,16 @@ void TxtMqttFactoryClient::publishStationBroadcast(const std::string station, do
 		js_broadcast["message"] = message;
 		sout_broadcast << js_broadcast;
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "str: {}",sout_broadcast.str());
+		spdlog::get("file_logger")->debug("str: {}",sout_broadcast.str());
 		try {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "topic: {}", TOPIC_LOCAL_BROADCAST);
+			spdlog::get("file_logger")->debug("topic: {}", TOPIC_LOCAL_BROADCAST);
 			auto msg_broadcast = mqtt::make_message(TOPIC_LOCAL_BROADCAST, sout_broadcast.str());
 			msg_broadcast->set_qos(iqos);
 			msg_broadcast->set_retained(bretained);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "publish Broadcast: {}", sts);
+			spdlog::get("file_logger")->debug("publish Broadcast: {}", sts);
+			
 			mqtt::token_ptr conntok = cli.publish(msg_broadcast, nullptr, aListPub);
 			bool r = conntok->wait_for(timeout);
 #ifdef FORCE_EXIT_ON_TIMEOUT
@@ -856,6 +952,7 @@ void TxtMqttFactoryClient::publishStationBroadcast(const std::string station, do
 	}
 	pthread_mutex_unlock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock publishStationBroadcast",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_unlock publishStationBroadcast",0);
 }
 
 void TxtMqttFactoryClient::publishSSC_Joy(TxtJoysticksData jd, long timeout) {
@@ -863,6 +960,8 @@ void TxtMqttFactoryClient::publishSSC_Joy(TxtJoysticksData jd, long timeout) {
 	spdlog::get("file_logger")->trace("publishSSC_Joy X1 Y1 b1 X2 Y2 b2: {} {} {} {} {} {} timeout:{}", jd.aX1, jd.aY1, jd.b1, jd.aX2, jd.aY2, jd.b2, timeout);
 	pthread_mutex_lock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock publishSSC_Joy",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_lock publishSSC_Joy",0);
+	
 	char sts[25];
 	ft::getnowstr(sts);
 	Json::Value js_pos;
@@ -878,10 +977,14 @@ void TxtMqttFactoryClient::publishSSC_Joy(TxtJoysticksData jd, long timeout) {
 		sout_pos << js_pos;
 		try {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "topic: {}", TOPIC_LOCAL_SSC_JOY);
+			spdlog::get("file_logger")->debug("topic: {}", TOPIC_LOCAL_SSC_JOY);
+	
 			auto msg_spos = mqtt::make_message(TOPIC_LOCAL_SSC_JOY, sout_pos.str());
 			msg_spos->set_qos(iqos);
 			msg_spos->set_retained(bretained);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "publish joysticks: {} {} {} {} {} {}", sts, jd.aX1, jd.aY1, jd.b1, jd.aX2, jd.aY2, jd.b2);
+			spdlog::get("file_logger")->debug("publish joysticks: {} {} {} {} {} {}", sts, jd.aX1, jd.aY1, jd.b1, jd.aX2, jd.aY2, jd.b2);
+			
 			mqtt::token_ptr conntok = cli.publish(msg_spos, nullptr, aListPub);
 			bool r = conntok->wait_for(timeout);
 #ifdef FORCE_EXIT_ON_TIMEOUT
@@ -896,6 +999,7 @@ void TxtMqttFactoryClient::publishSSC_Joy(TxtJoysticksData jd, long timeout) {
 	}
 	pthread_mutex_unlock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock publishSSC_Joy",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_unlock publishSSC_Joy",0);
 }
 
 void TxtMqttFactoryClient::publishMPO_Ack(TxtMpoAckCode_t code, long timeout)
@@ -905,6 +1009,8 @@ void TxtMqttFactoryClient::publishMPO_Ack(TxtMpoAckCode_t code, long timeout)
 	spdlog::get("file_logger")->trace("publishMPO_Ack timeout:{}", timeout);
 	pthread_mutex_lock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock publishMPO_Ack",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_lock publishMPO_Ack",0);
+	
 	Json::Value js_ack;
 	std::ostringstream sout_ack;
 	char sts[25];
@@ -915,10 +1021,14 @@ void TxtMqttFactoryClient::publishMPO_Ack(TxtMpoAckCode_t code, long timeout)
 		sout_ack << js_ack;
 		try {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "topic: {}", TOPIC_LOCAL_MPO_ACK);
+			spdlog::get("file_logger")->debug("topic: {}", TOPIC_LOCAL_MPO_ACK);
+			
 			auto msg_ack = mqtt::make_message(TOPIC_LOCAL_MPO_ACK, sout_ack.str());
 			msg_ack->set_qos(iqos);
 			msg_ack->set_retained(bretained);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "publish: {} {}", sts, (int)code);
+			spdlog::get("file_logger")->debug("publish: {} {}", sts, (int)code);
+			
 			mqtt::token_ptr conntok = cli.publish(msg_ack, nullptr, aListPub);
 			bool r = conntok->wait_for(timeout);
 #ifdef FORCE_EXIT_ON_TIMEOUT
@@ -933,6 +1043,7 @@ void TxtMqttFactoryClient::publishMPO_Ack(TxtMpoAckCode_t code, long timeout)
 	}
 	pthread_mutex_unlock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock publishMPO_Ack",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_unlock publishMPO_Ack",0);
 }
 
 void TxtMqttFactoryClient::publishVGR_Do(TxtVgrDoCode_t code, TxtWorkpiece* wp, long timeout)
@@ -942,6 +1053,7 @@ void TxtMqttFactoryClient::publishVGR_Do(TxtVgrDoCode_t code, TxtWorkpiece* wp, 
 	pthread_mutex_lock(&m_mutex);
 	pthread_mutex_lock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock publishVGR_Do",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_lock publishVGR_Do",0);
 	Json::Value js_ack;
 	std::ostringstream sout_ack;
 	char sts[25];
@@ -964,10 +1076,14 @@ void TxtMqttFactoryClient::publishVGR_Do(TxtVgrDoCode_t code, TxtWorkpiece* wp, 
 		sout_ack << js_ack;
 		try {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "topic: {}", TOPIC_LOCAL_VGR_DO);
+			spdlog::get("file_logger")->debug("topic: {}", TOPIC_LOCAL_VGR_DO);
+			
 			auto msg_ack = mqtt::make_message(TOPIC_LOCAL_VGR_DO, sout_ack.str());
 			msg_ack->set_qos(iqos);
 			msg_ack->set_retained(bretained);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "publish: {}", (int)code);
+			spdlog::get("file_logger")->debug("publish: {}", (int)code);
+			
 			mqtt::token_ptr conntok = cli.publish(msg_ack, nullptr, aListPub);
 			bool r = conntok->wait_for(timeout);
 #ifdef FORCE_EXIT_ON_TIMEOUT
@@ -982,6 +1098,7 @@ void TxtMqttFactoryClient::publishVGR_Do(TxtVgrDoCode_t code, TxtWorkpiece* wp, 
 	}
 	pthread_mutex_unlock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock publishVGR_Do",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_unlock publishVGR_Do",0);
 }
 
 void TxtMqttFactoryClient::publishHBW_Ack(TxtHbwAckCode_t code, TxtWorkpiece* wp, long timeout)
@@ -990,6 +1107,8 @@ void TxtMqttFactoryClient::publishHBW_Ack(TxtHbwAckCode_t code, TxtWorkpiece* wp
 	spdlog::get("file_logger")->trace("publishHBW_Ack code:{} timeout:{}", (int)code, timeout);
 	pthread_mutex_lock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock publishHBW_Ack",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_lock publishHBW_Ack",0);
+	
 	Json::Value js_ack;
 	std::ostringstream sout_ack;
 	char sts[25];
@@ -1011,10 +1130,14 @@ void TxtMqttFactoryClient::publishHBW_Ack(TxtHbwAckCode_t code, TxtWorkpiece* wp
 		sout_ack << js_ack;
 		try {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "topic: {}", TOPIC_LOCAL_HBW_ACK);
+			spdlog::get("file_logger")->debug("topic: {}", TOPIC_LOCAL_HBW_ACK);
+	
 			auto msg_ack = mqtt::make_message(TOPIC_LOCAL_HBW_ACK, sout_ack.str());
 			msg_ack->set_qos(iqos);
 			msg_ack->set_retained(bretained);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "publish: {} {}", sts, (int)code);
+			spdlog::get("file_logger")->debug("publish: {} {}", sts, (int)code);
+			
 			mqtt::token_ptr conntok = cli.publish(msg_ack, nullptr, aListPub);
 			bool r = conntok->wait_for(timeout);
 #ifdef FORCE_EXIT_ON_TIMEOUT
@@ -1029,6 +1152,7 @@ void TxtMqttFactoryClient::publishHBW_Ack(TxtHbwAckCode_t code, TxtWorkpiece* wp
 	}
 	pthread_mutex_unlock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock publishHBW_Ack",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_unlock publishHBW_Ack",0);
 }
 
 void TxtMqttFactoryClient::publishSLD_Ack(TxtSldAckCode_t code, TxtWPType_t type, int value, long timeout)
@@ -1037,6 +1161,8 @@ void TxtMqttFactoryClient::publishSLD_Ack(TxtSldAckCode_t code, TxtWPType_t type
 	spdlog::get("file_logger")->trace("publishSLD_Ack code:{} type:{} value:{} timeout:{}", (int)code, (int)type, value, timeout);
 	pthread_mutex_lock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock publishSLD_Ack",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_lock publishSLD_Ack",0);
+	
 	Json::Value js_ack;
 	std::ostringstream sout_ack;
 	char sts[25];
@@ -1068,6 +1194,7 @@ void TxtMqttFactoryClient::publishSLD_Ack(TxtSldAckCode_t code, TxtWPType_t type
 	}
 	pthread_mutex_unlock(&m_mutex);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock publishSLD_Ack",0);
+	spdlog::get("file_logger")->debug("pthread_mutex_unlock publishSLD_Ack",0);
 }
 
 

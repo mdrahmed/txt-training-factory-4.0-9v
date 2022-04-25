@@ -27,6 +27,7 @@ long time_offset()
     std::string s = os.str();
     // s is in ISO 8601 format: "±HHMM"
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "±HHMM {}", s);
+	spdlog::get("file_logger")->debug("±HHMM {}", s);
     int h = std::stoi(s.substr(0,3), nullptr, 10);
     int m = std::stoi(s[0]+s.substr(3), nullptr, 10);
     return h * 3600 + m * 60;
@@ -43,16 +44,19 @@ bool trycheckTimestampTTL(const std::string& str, double diff_max)
 	std::ostringstream ss_start;
 	ss_start << std::put_time(std::gmtime(&itt_start), "%FT%TZ");
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "ss_start.str():{}", ss_start.str());
+	spdlog::get("file_logger")->debug("ss_start.str():{}", ss_start.str());
 
 	auto itt_now = std::chrono::system_clock::to_time_t(now);
 	std::ostringstream ss_now;
 	ss_now << std::put_time(std::gmtime(&itt_now), "%FT%TZ");
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "ss_now.str():{}", ss_now.str());
+	spdlog::get("file_logger")->debug("ss_now.str():{}", ss_now.str());
 
 	auto dur = now-start;
 	auto diff_s = std::abs(std::chrono::duration_cast< std::chrono::duration<float> >(dur).count());
 
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "str:{} diff_s:{} diff_max:{}", str.c_str(), diff_s, diff_max);
+	spdlog::get("file_logger")->debug("str:{} diff_s:{} diff_max:{}", str.c_str(), diff_s, diff_max);
 
 	bool r = (diff_s < diff_max);
 	if (!r)
@@ -123,6 +127,7 @@ std::chrono::system_clock::time_point trygettimepoint(const std::string& str)
 	_str = _str.substr(0,_str.length()-1); // ...Z
 	//_str = _str.substr(0,_str.find(".")); // .XXX
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "replace {}",_str);
+	spdlog::get("file_logger")->debug("replace {}",_str);
     std::istringstream iss{_str};
     std::tm tm = {0};
     tm.tm_isdst = -1; //initialize!
@@ -135,6 +140,7 @@ std::chrono::system_clock::time_point trygettimepoint(const std::string& str)
 	char sts[25];
     gettimestr(t, 0, sts);
     SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "sts {}", sts);
+    spdlog::get("file_logger")->debug("sts {}", sts);
 
     std::chrono::system_clock::time_point tp = std::chrono::system_clock::from_time_t(t);
 
@@ -142,6 +148,7 @@ std::chrono::system_clock::time_point trygettimepoint(const std::string& str)
 	std::ostringstream ss_tp;
 	ss_tp << std::put_time(std::gmtime(&itt_tp), "%FT%TZ");
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "ss_tp.str():{}", ss_tp.str());
+	spdlog::get("file_logger")->debug("ss_tp.str():{}", ss_tp.str());
 
     if (iss.eof())
     {
@@ -155,6 +162,7 @@ std::chrono::system_clock::time_point trygettimepoint(const std::string& str)
     using hr_clock = std::chrono::high_resolution_clock;
     std::size_t nanoseconds = zz * hr_clock::period::den / hr_clock::period::num;
     SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "frac seconds {}",(double)(nanoseconds)/1000000000.);
+    spdlog::get("file_logger")->debug("frac seconds {}",(double)(nanoseconds)/1000000000.);
     return tp += hr_clock::duration(nanoseconds);
 }
 

@@ -84,6 +84,7 @@ class action_listener_subscribe : public virtual mqtt::iaction_listener
 		spdlog::get("file_logger")->trace("on_failure", 0);
 		if (tok.get_message_id() != 0)
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  for token: [{}]", tok.get_message_id());
+			spdlog::get("file_logger")->debug("  for token: [{}]", tok.get_message_id());
 	}
 
 	void on_success(const mqtt::token& tok) override {
@@ -91,11 +92,13 @@ class action_listener_subscribe : public virtual mqtt::iaction_listener
 		spdlog::get("file_logger")->trace("on_success", 0);
 		if (tok.get_message_id() != 0)
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  for token: [{}]", tok.get_message_id());
+			spdlog::get("file_logger")->debug("  for token: [{}]", tok.get_message_id());
 		auto topics_ = tok.get_topics();
 		if (topics_ && !topics_->empty()) {
 			for(unsigned int i = 0; i < topics_->size(); i++) {
 				std::string topic0 = (*topics_)[i];
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  token topic: '{}'", topic0);
+				spdlog::get("file_logger")->debug("  token topic: '{}'", topic0);
 			}
 		}
 	}
@@ -112,6 +115,7 @@ class action_listener_publish : public virtual mqtt::iaction_listener
 		spdlog::get("file_logger")->trace("on_failure", 0);
 		if (tok.get_message_id() != 0)
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  for token: [{}]", tok.get_message_id());
+			spdlog::get("file_logger")->debug("  for token: [{}]", tok.get_message_id());
 	}
 
 	void on_success(const mqtt::token& tok) override {
@@ -119,11 +123,13 @@ class action_listener_publish : public virtual mqtt::iaction_listener
 		spdlog::get("file_logger")->trace("on_success", 0);
 		if (tok.get_message_id() != 0)
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  for token: [{}]", tok.get_message_id());
+			spdlog::get("file_logger")->debug("  for token: [{}]", tok.get_message_id());
 		auto topics_ = tok.get_topics();
 		if (topics_ && !topics_->empty()) {
 			for(unsigned int i = 0; i < topics_->size(); i++) {
 				std::string topic0 = (*topics_)[i];
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  token topic: '{}'", topic0);
+				spdlog::get("file_logger")->debug("  token topic: '{}'", topic0);
 			}
 		}
 	}

@@ -166,6 +166,7 @@ bool TxtHighBayWarehouseStorage::storeContainer()
 			if (wp[i][j] == 0)
 			{
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "0 -> nextStorePos {} {}",p.x, p.y);
+				spdlog::get("file_logger")->debug("0 -> nextStorePos {} {}",p.x, p.y);
 				nextStorePos = p;
 				found = true;
 			}
@@ -174,6 +175,8 @@ bool TxtHighBayWarehouseStorage::storeContainer()
 	if (isValidPos(nextFetchPos)) //nextFetchPos
 	{
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK -> nextStorePos",0);
+		spdlog::get("file_logger")->debug("OK -> nextStorePos",0);
+		
 		wp[nextFetchPos.x][nextFetchPos.y] = 0;
 		Notify();
 		print();
@@ -191,6 +194,8 @@ bool TxtHighBayWarehouseStorage::store(TxtWorkpiece _wp)
 	if (_wp.type == WP_TYPE_NONE)
 	{
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "NONE -> return false",0);
+		spdlog::get("file_logger")->debug("NONE -> return false",0);
+		
 		return false;
 	} else
 	{
@@ -204,6 +209,7 @@ bool TxtHighBayWarehouseStorage::store(TxtWorkpiece _wp)
 				if (wp[i][j] == 0)
 				{
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "0 -> nextStorePos {} {}",p.x, p.y);
+					spdlog::get("file_logger")->debug("0 -> nextStorePos {} {}",p.x, p.y);
 					nextStorePos = p;
 					found = true;
 				}
@@ -213,6 +219,8 @@ bool TxtHighBayWarehouseStorage::store(TxtWorkpiece _wp)
 	if (isValidPos(nextFetchPos))
 	{
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK -> nextStorePos type {} ",_wp.type);
+		spdlog::get("file_logger")->debug("OK -> nextStorePos type {} ",_wp.type);
+		
 		wp[nextFetchPos.x][nextFetchPos.y] = new TxtWorkpiece(_wp);
 		Notify();
 		print();
@@ -230,6 +238,7 @@ bool TxtHighBayWarehouseStorage::fetch(TxtWPType_t t)
 	if (t == WP_TYPE_NONE)
 	{
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "STORAGE_EMPTY -> return false",0);
+		spdlog::get("file_logger")->debug("STORAGE_EMPTY -> return false",0);
 		return false;
 	} else
 	{
@@ -245,6 +254,8 @@ bool TxtHighBayWarehouseStorage::fetch(TxtWPType_t t)
 				if (wp[i][j]->type == t)
 				{
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "t {} -> nextFetchPos {} {}",t, p.x, p.y);
+					spdlog::get("file_logger")->debug("t {} -> nextFetchPos {} {}",t, p.x, p.y);
+					
 					nextFetchPos = p;
 					found = true;
 				}
@@ -254,6 +265,8 @@ bool TxtHighBayWarehouseStorage::fetch(TxtWPType_t t)
 	if (isValidPos(nextFetchPos))
 	{
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK -> nextFetchPos type {} ",t);
+		spdlog::get("file_logger")->debug("OK -> nextFetchPos type {} ",t);
+		
 		delete wp[nextFetchPos.x][nextFetchPos.y];
 		wp[nextFetchPos.x][nextFetchPos.y] = 0;
 		Notify();
@@ -279,6 +292,8 @@ bool TxtHighBayWarehouseStorage::fetchContainer()
 			if (wp[i][j] == 0)
 			{
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "cont -> nextFetchPos {} {}",p.x, p.y);
+				spdlog::get("file_logger")->debug("cont -> nextFetchPos {} {}",p.x, p.y);
+				
 				nextFetchPos = p;
 				found = true;
 			}
@@ -287,6 +302,8 @@ bool TxtHighBayWarehouseStorage::fetchContainer()
 	if (isValidPos(nextFetchPos))
 	{
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK -> nextFetchPos cont ",0);
+		spdlog::get("file_logger")->debug("OK -> nextFetchPos cont ",0);
+				
 		wp[nextFetchPos.x][nextFetchPos.y] = 0;
 		Notify();
 		print();
@@ -304,6 +321,7 @@ bool TxtHighBayWarehouseStorage::isValidPos(StoragePos2 p)
 	{
 		ret = true;
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK",0);
+		spdlog::get("file_logger")->debug("OK",0);
 	}
 	return ret;
 }

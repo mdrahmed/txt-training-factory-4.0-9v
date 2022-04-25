@@ -99,6 +99,7 @@ void TxtMotionDetection::run() {
 			cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
 			cv::GaussianBlur(gray, gray, cv::Size(21, 21), 0);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "TxtMotionDetection cvtColor");
+			spdlog::get("file_logger")->debug("TxtMotionDetection cvtColor");
 
 			if (!gray_last.empty()) {
 				//compute difference between first frame and current frame
@@ -112,6 +113,8 @@ void TxtMotionDetection::run() {
 				cv::findContours(thresh, cnts, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "TxtMotionDetection findContours {}", cnts.size());
+				spdlog::get("file_logger")->debug("TxtMotionDetection findContours {}", cnts.size());
+				
 				for(unsigned int i = 0; i< cnts.size(); i++) {
 					std::vector<cv::Point> cnt = cnts[i];
 					double cArea = contourArea(cnts[i]);
@@ -123,6 +126,7 @@ void TxtMotionDetection::run() {
 					//cv::Point maxVal = rectcnt.br() - cv::Point(1, 1);
 					//SPDLOG_LOGGER_DEBUG(spdlog::get("console"), ".......... cnt size:{} min:{} {} max:{} {}", cnt.size(), minVal.x, minVal.y, maxVal.x, maxVal.y);
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "---------- cnt.size:{} cArea:{}({})", cnt.size(), cArea, max_limit_Area);
+					spdlog::get("file_logger")->debug("---------- cnt.size:{} cArea:{}({})", cnt.size(), cArea, max_limit_Area);
 #endif
 					if(cArea < max_limit_Area) { //default 500
 						continue;
@@ -133,8 +137,12 @@ void TxtMotionDetection::run() {
 					auto dur = tsDetected-tsLastDetected;
 					auto secs = std::chrono::duration_cast< std::chrono::duration<float> >(dur);
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "========== elapsed_seconds:{} ({})", secs.count(), TIMEWAIT_S_MAX);
+					spdlog::get("file_logger")->debug("========== elapsed_seconds:{} ({})", secs.count(), TIMEWAIT_S_MAX);
+					
 					if (secs.count() > TIMEWAIT_S_MAX) {
 						SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "XXXXXXXXXX TRIGGER");
+						spdlog::get("file_logger")->debug("XXXXXXXXXX TRIGGER");
+						
 						tsLastDetected = tsDetected;
 						Notify(); //motion detectionl
 					}

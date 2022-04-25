@@ -128,6 +128,8 @@ EncPos2 TxtHighBayWarehouse::moveConv(bool stop)
 	}
 	EncPos2 pos2 = calibData.conv;
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pos:{} {}", pos2.x, pos2.y);
+	spdlog::get("file_logger")->debug("pos:{} {}", pos2.x, pos2.y);
+	
 	std::thread tx = axisX.moveAbsThread(pos2.x);
 	std::thread ty = axisY.moveAbsThread(pos2.y);
 	tx.join();
@@ -144,6 +146,8 @@ EncPos2 TxtHighBayWarehouse::moveCR(int i, int j)
 	pos2.x = calibData.hbx[i];
 	pos2.y = calibData.hby[j];
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pos:{} {}", pos2.x, pos2.y);
+	spdlog::get("file_logger")->debug("pos:{} {}", pos2.x, pos2.y);
+	
 	std::thread tx = axisX.moveAbsThread(pos2.x);
 	std::thread ty = axisY.moveAbsThread(pos2.y);
 	tx.join();

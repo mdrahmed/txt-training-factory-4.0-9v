@@ -85,6 +85,7 @@ class callback : public virtual mqtt::callback
 	void message_arrived(mqtt::const_message_ptr msg) override {
 		assert(msg);
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "message_arrived  message:{} payload:{}", msg->get_topic(), msg->to_string());
+		spdlog::get("file_logger")->debug("message_arrived  message:{} payload:{}", msg->get_topic(), msg->to_string());
 		//BUGFIX: msg->get_topic() is empty
 		//FIX paho.mqtt.cpp: https://github.com/eclipse/paho.mqtt.c/issues/440#issuecomment-380161713
 
@@ -93,12 +94,15 @@ class callback : public virtual mqtt::callback
 #ifdef CLIENT_MPO
 		if (msg->get_topic() == TOPIC_OUTPUT_STATE_ACK) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED state ack:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED state ack:{}", msg->get_topic());
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
 				ssin >> root;
 				std::string sts = root["ts"].asString();
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  ts:{}", sts);
+				
+				spdlog::get("file_logger")->debug("  ts:{}", sts);
 
 				if (ft::trycheckTimestampTTL(sts))
 				{
@@ -108,8 +112,12 @@ class callback : public virtual mqtt::callback
 				std::cout << "Error: " << exc.what() << std::endl;
 			}
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK.", 0);
+			spdlog::get("file_logger")->debug("OK.", 0);
+			
 		} else if (msg->get_topic() == TOPIC_LOCAL_VGR_DO) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED vgr do:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED vgr do:{}", msg->get_topic());
+			
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
@@ -117,6 +125,7 @@ class callback : public virtual mqtt::callback
 				std::string sts = root["ts"].asString();
 				ft::TxtVgrDoCode_t code = (ft::TxtVgrDoCode_t)root["code"].asInt();
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  ts:{} code:{}", sts, (int)code);
+				spdlog::get("file_logger")->debug("  ts:{} code:{}", sts, (int)code);
 
 				if (ft::trycheckTimestampTTL(sts))
 				{
@@ -160,8 +169,12 @@ class callback : public virtual mqtt::callback
 				std::cout << "Error: " << exc.what() << std::endl;
 			}
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK.", 0);
+			spdlog::get("file_logger")->debug("OK.", 0);
+			
 		} else if (msg->get_topic() == TOPIC_LOCAL_SLD_ACK) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED SLD ack:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED SLD ack:{}", msg->get_topic());
+			
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
@@ -169,6 +182,7 @@ class callback : public virtual mqtt::callback
 				std::string sts = root["ts"].asString();
 				ft::TxtSldAckCode_t code = (ft::TxtSldAckCode_t)root["code"].asInt();
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  ts:{} code:{}", sts, (int)code);
+				spdlog::get("file_logger")->debug("  ts:{} code:{}", sts, (int)code);
 
 				if (ft::trycheckTimestampTTL(sts))
 				{
@@ -188,6 +202,8 @@ class callback : public virtual mqtt::callback
 				std::cout << "Error: " << exc.what() << std::endl;
 			}
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK.", 0);
+			spdlog::get("file_logger")->debug("OK.", 0);
+			
 		} else {
 			std::cout << "Unknown topic: " << msg->get_topic() << std::endl;
 			spdlog::get("file_logger")->error("Unknown topic: {}",msg->get_topic());
@@ -196,12 +212,16 @@ class callback : public virtual mqtt::callback
 #elif CLIENT_HBW
 		if (msg->get_topic() == TOPIC_OUTPUT_STATE_ACK) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED state ack:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED state ack:{}", msg->get_topic());
+			
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
 				ssin >> root;
 				std::string sts = root["ts"].asString();
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  ts:{}", sts);
+				spdlog::get("file_logger")->debug("  ts:{}", sts);
+				
 				if (ft::trycheckTimestampTTL(sts))
 				{
 					hbw_.requestQuit();
@@ -210,14 +230,20 @@ class callback : public virtual mqtt::callback
 				std::cout << "Error: " << exc.what() << std::endl;
 			}
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK.", 0);
+			spdlog::get("file_logger")->debug("OK.", 0);
+				
 		} else if (msg->get_topic() == TOPIC_LOCAL_SSC_JOY) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED joy:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED joy:{}", msg->get_topic());
+			
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
 				ssin >> root;
 				std::string sts = root["ts"].asString();
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  ts:{}", sts);
+				spdlog::get("file_logger")->debug("  ts:{}", sts);
+				
 				if (ft::trycheckTimestampTTL(sts))
 				{
 					ft::TxtJoysticksData jd;
@@ -229,13 +255,19 @@ class callback : public virtual mqtt::callback
 					jd.b2 = root["b2"].asBool();
 					hbw_.requestJoyBut(jd);
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  1:{} {} {} 2:{} {} {}", jd.aX1, jd.aY1, jd.b1, jd.aX2, jd.aY2, jd.b2);
+					spdlog::get("file_logger")->debug("  1:{} {} {} 2:{} {} {}", jd.aX1, jd.aY1, jd.b1, jd.aX2, jd.aY2, jd.b2);
+					
 				}
 			} catch (const Json::RuntimeError& exc) {
 				std::cout << "Error: " << exc.what() << std::endl;
 			}
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK.", 0);
+			spdlog::get("file_logger")->debug("OK.", 0);
+			
 		} else if (msg->get_topic() == TOPIC_LOCAL_VGR_DO) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED vgr do:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED vgr do:{}", msg->get_topic());
+			
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
@@ -243,6 +275,7 @@ class callback : public virtual mqtt::callback
 				std::string sts = root["ts"].asString();
 				ft::TxtVgrDoCode_t code = (ft::TxtVgrDoCode_t)root["code"].asInt();
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  ts:{} code:{}", sts, (int)code);
+				spdlog::get("file_logger")->debug("  ts:{} code:{}", sts, (int)code);
 
 				if (ft::trycheckTimestampTTL(sts))
 				{
@@ -301,6 +334,8 @@ class callback : public virtual mqtt::callback
 				std::cout << "Error: " << exc.what() << std::endl;
 			}
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK.", 0);
+			spdlog::get("file_logger")->debug("OK.", 0);
+			
 		} else {
 			std::cout << "Unknown topic: " << msg->get_topic() << std::endl;
 			spdlog::get("file_logger")->error("Unknown topic: {}",msg->get_topic());
@@ -309,12 +344,15 @@ class callback : public virtual mqtt::callback
 #elif CLIENT_VGR
 		if (msg->get_topic() == TOPIC_OUTPUT_STATE_ACK) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED state ack:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED state ack:{}", msg->get_topic());
+			
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
 				ssin >> root;
 				std::string sts = root["ts"].asString();
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  ts:{}", sts);
+				spdlog::get("file_logger")->debug("  ts:{}", sts);
 				if (ft::trycheckTimestampTTL(sts))
 				{
 					vgr_.requestQuit();
@@ -323,18 +361,23 @@ class callback : public virtual mqtt::callback
 				std::cout << "Error: " << exc.what() << std::endl;
 			}
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK.", 0);
+			spdlog::get("file_logger")->debug("OK.", 0);
 		} else if (msg->get_topic() == TOPIC_OUTPUT_ORDER) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED order:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED order:{}", msg->get_topic());
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
 				ssin >> root;
 				std::string sts = root["ts"].asString();
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  ts:{}", sts);
+				spdlog::get("file_logger")->debug("  ts:{}", sts);
+				
 				if (ft::trycheckTimestampTTL(sts))
 				{
 					std::string stype = root["type"].asString();
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  type:{}", stype);
+					spdlog::get("file_logger")->debug("  type:{}", stype);
 					if (stype == "WHITE")
 					{
 						vgr_.requestOrder(ft::WP_TYPE_WHITE);
@@ -350,18 +393,23 @@ class callback : public virtual mqtt::callback
 				std::cout << "Error: " << exc.what() << std::endl;
 			}
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK.", 0);
+					spdlog::get("file_logger")->debug("OK.", 0);
 		} else if (msg->get_topic() == TOPIC_OUTPUT_NFC_DS) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED nfc ds:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED nfc ds:{}", msg->get_topic());
+			
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
 				ssin >> root;
 				std::string sts = root["ts"].asString();
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  ts:{}", sts);
+				spdlog::get("file_logger")->debug("  ts:{}", sts);
 				if (ft::trycheckTimestampTTL(sts))
 				{
 					std::string scmd = root["cmd"].asString();
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  cmd:{}", scmd);
+					spdlog::get("file_logger")->debug("  cmd:{}", scmd);
 					if (scmd == "read")
 					{
 						vgr_.requestNfcRead();
@@ -373,14 +421,20 @@ class callback : public virtual mqtt::callback
 				std::cout << "Error: " << exc.what() << std::endl;
 			}
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK.", 0);
+			spdlog::get("file_logger")->debug("OK.", 0);
+					
 		} else if (msg->get_topic() == TOPIC_LOCAL_SSC_JOY) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED joy but:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED joy but:{}", msg->get_topic());
+			
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
 				ssin >> root;
 				std::string sts = root["ts"].asString();
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  ts:{}", sts);
+				spdlog::get("file_logger")->debug("  ts:{}", sts);
+				
 				if (ft::trycheckTimestampTTL(sts))
 				{
 					ft::TxtJoysticksData jd;
@@ -392,6 +446,7 @@ class callback : public virtual mqtt::callback
 					jd.b2 = root["b2"].asBool();
 					vgr_.requestJoyBut(jd);
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  1:{} {} {} 2:{} {} {}", jd.aX1, jd.aY1, jd.b1, jd.aX2, jd.aY2, jd.b2);
+					spdlog::get("file_logger")->debug("  1:{} {} {} 2:{} {} {}", jd.aX1, jd.aY1, jd.b1, jd.aX2, jd.aY2, jd.b2);
 				}
 			} catch (const Json::RuntimeError& exc) {
 				std::cout << "Error: " << exc.what() << std::endl;
@@ -399,6 +454,8 @@ class callback : public virtual mqtt::callback
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK.", 0);
 		} else if (msg->get_topic() == TOPIC_LOCAL_MPO_ACK) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED MPO ack:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED MPO ack:{}", msg->get_topic());
+			
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
@@ -406,6 +463,7 @@ class callback : public virtual mqtt::callback
 				std::string sts = root["ts"].asString();
 				ft::TxtMpoAckCode_t code = (ft::TxtMpoAckCode_t)root["code"].asInt();
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  ts:{} code:{}", sts, (int)code);
+				spdlog::get("file_logger")->debug("  ts:{} code:{}", sts, (int)code);
 
 				if (ft::trycheckTimestampTTL(sts))
 				{
@@ -449,8 +507,11 @@ class callback : public virtual mqtt::callback
 				std::cout << "Error: " << exc.what() << std::endl;
 			}
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK.", 0);
+			spdlog::get("file_logger")->debug("OK.", 0);
+			
 		} else if (msg->get_topic() == TOPIC_LOCAL_HBW_ACK) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED HBW ack:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED HBW ack:{}", msg->get_topic());
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
@@ -460,6 +521,7 @@ class callback : public virtual mqtt::callback
 				{
 					ft::TxtHbwAckCode_t code = (ft::TxtHbwAckCode_t)root["code"].asInt();
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  ts:{} code:{}", sts, (int)code);
+					spdlog::get("file_logger")->debug("  ts:{} code:{}", sts, (int)code);
 
 					ft::TxtWorkpiece* wp = NULL;
 					if (root["workpiece"] != Json::Value::null) {
@@ -509,8 +571,12 @@ class callback : public virtual mqtt::callback
 				std::cout << "Error: " << exc.what() << std::endl;
 			}
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK.", 0);
+			spdlog::get("file_logger")->debug("OK.", 0);
+			
 		} else if (msg->get_topic() == TOPIC_LOCAL_SLD_ACK) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED SLD ack:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED SLD ack:{}", msg->get_topic());
+			
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
@@ -520,9 +586,12 @@ class callback : public virtual mqtt::callback
 				{
 					ft::TxtSldAckCode_t code = (ft::TxtSldAckCode_t)root["code"].asInt();
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  ts:{} code:{}", sts, (int)code);
+					spdlog::get("file_logger")->debug("  ts:{} code:{}", sts, (int)code);
 
 					std::string stype = root["type"].asString();
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  type:{}", stype);
+					spdlog::get("file_logger")->debug("  type:{}", stype);
+					
 					ft::TxtWPType_t type = ft::WP_TYPE_NONE;
 					if (stype == "WHITE") {
 						type = ft::WP_TYPE_WHITE;
@@ -550,6 +619,8 @@ class callback : public virtual mqtt::callback
 				std::cout << "Error: " << exc.what() << std::endl;
 			}
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK.", 0);
+			spdlog::get("file_logger")->debug("OK.", 0);
+			
 		} else {
 			std::cout << "Unknown topic: " << msg->get_topic() << std::endl;
 			spdlog::get("file_logger")->error("Unknown topic: {}",msg->get_topic());
@@ -558,12 +629,14 @@ class callback : public virtual mqtt::callback
 #elif CLIENT_SLD
 		if (msg->get_topic() == TOPIC_OUTPUT_STATE_ACK) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED state ack:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED state ack:{}", msg->get_topic());
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
 				ssin >> root;
 				std::string sts = root["ts"].asString();
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  ts:{}", sts);
+				spdlog::get("file_logger")->debug("  ts:{}", sts);
 				if (ft::trycheckTimestampTTL(sts))
 				{
 					sld_.requestQuit();
@@ -572,14 +645,19 @@ class callback : public virtual mqtt::callback
 				std::cout << "Error: " << exc.what() << std::endl;
 			}
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK.", 0);
+				spdlog::get("file_logger")->debug("OK.", 0);
 		} else if (msg->get_topic() == TOPIC_LOCAL_SSC_JOY) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED joy:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED joy:{}", msg->get_topic());
+			
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
 				ssin >> root;
 				std::string sts = root["ts"].asString();
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  ts:{}", sts);
+				spdlog::get("file_logger")->debug("  ts:{}", sts);
+				
 				if (ft::trycheckTimestampTTL(sts))
 				{
 					ft::TxtJoysticksData jd;
@@ -591,13 +669,19 @@ class callback : public virtual mqtt::callback
 					jd.b2 = root["b2"].asBool();
 					sld_.requestJoyBut(jd);
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  1:{} {} {} 2:{} {} {}", jd.aX1, jd.aY1, jd.b1, jd.aX2, jd.aY2, jd.b2);
+					spdlog::get("file_logger")->debug("  1:{} {} {} 2:{} {} {}", jd.aX1, jd.aY1, jd.b1, jd.aX2, jd.aY2, jd.b2);
+					
 				}
 			} catch (const Json::RuntimeError& exc) {
 				std::cout << "Error: " << exc.what() << std::endl;
 			}
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK.", 0);
+			spdlog::get("file_logger")->debug("OK.", 0);
+			
 		} else if (msg->get_topic() == TOPIC_LOCAL_MPO_ACK) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED mpo ack:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED mpo ack:{}", msg->get_topic());
+			
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
@@ -607,6 +691,7 @@ class callback : public virtual mqtt::callback
 				{
 					ft::TxtMpoAckCode_t code = (ft::TxtMpoAckCode_t)root["code"].asInt();
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  ts:{} code:{}", sts, (int)code);
+					spdlog::get("file_logger")->debug("  ts:{} code:{}", sts, (int)code);
 					switch (code)
 					{
 					case ft::MPO_PRODUCED:
@@ -620,8 +705,12 @@ class callback : public virtual mqtt::callback
 				std::cout << "Error: " << exc.what() << std::endl;
 			}
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK.", 0);
+			spdlog::get("file_logger")->debug("OK.", 0);
+			
 		} else if (msg->get_topic() == TOPIC_LOCAL_VGR_DO) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED vgr do:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED vgr do:{}", msg->get_topic());
+			
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
@@ -629,6 +718,8 @@ class callback : public virtual mqtt::callback
 				std::string sts = root["ts"].asString();
 				ft::TxtVgrDoCode_t code = (ft::TxtVgrDoCode_t)root["code"].asInt();
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  ts:{} code:{}", sts, (int)code);
+				spdlog::get("file_logger")->debug("  ts:{} code:{}", sts, (int)code);
+				
 				if (ft::trycheckTimestampTTL(sts))
 				{
 					switch(code)
@@ -650,6 +741,8 @@ class callback : public virtual mqtt::callback
 				std::cout << "Error: " << exc.what() << std::endl;
 			}
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK.", 0);
+			spdlog::get("file_logger")->debug("OK.", 0);
+			
 		} else {
 			std::cout << "Unknown topic: " << msg->get_topic() << std::endl;
 			spdlog::get("file_logger")->error("Unknown topic: {}",msg->get_topic());
@@ -710,14 +803,12 @@ int main(int argc, char* argv[])
 		spdlog::set_error_handler([](const std::string& msg)
 	    {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "err handler spdlog:{}", msg);
+			spdlog::get("file_logger")->debug("err handler spdlog:{}", msg);
 	    });
 
 		auto file_logger = spdlog::basic_logger_mt<spdlog::async_factory>("file_logger", "Data/"+clientName+".log", true);
 		spdlog::get("file_logger")->set_level(spdlog::level::trace);
 		spdlog::get("file_logger")->info("{} {}", clientName.c_str(), TxtAppVer);
-		spdlog::get("file_logger")->info("adding new lgos {} {}", clientName.c_str(), TxtAppVer);
-		spdlog::get("file_logger")->info("adding new lgos {} {}", clientName.c_str(), TxtAppVer);
-		spdlog::get("file_logger")->info("adding new lgos {} {}", clientName.c_str(), TxtAppVer);
 
 		// Console logger with color
 		auto console = spdlog::stdout_color_mt("console");

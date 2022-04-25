@@ -38,6 +38,7 @@ bool SLDTransferAreaCallbackFunction(FISH_X1_TRANSFER *pTArea, int i32NrAreas)
 		//SPDLOG_LOGGER_TRACE(spdlog::get("console"), "SLDTransferAreaCallbackFunction: new State", 0);
 		u16Counter++;
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "u16Counter {}",u16Counter);
+		spdlog::get("file_logger")->debug("u16Counter {}",u16Counter);
 		u16LastState = pTArea->ftX1in.cnt_in[0];
 	}
 	return true; // if you return FALSE, then the hardware update is stopped !!!

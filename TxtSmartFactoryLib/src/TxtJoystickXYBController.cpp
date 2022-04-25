@@ -125,6 +125,7 @@ void TxtJoystickXYBController::run() {
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "off x1 y1 x2 y2: {} {} {} {}", offx1, offy1, offx2, offy2);
+		spdlog::get("file_logger")->debug("off x1 y1 x2 y2: {} {} {} {}", offx1, offy1, offx2, offy2);
 	}
 
 	TxtJoysticksData jdLast;

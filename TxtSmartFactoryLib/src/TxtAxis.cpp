@@ -80,6 +80,7 @@ void TxtAxis::setStatus(TxtAxis_status_t st) {
 	status=st;
 	std::string sst = toString(status);
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console_axes"), "{} setStatus:{}",name,sst);
+	spdlog::get("file_logger")->debug("{} setStatus:{}",name,sst);
 }
 
 void TxtAxis::setMotorOff()

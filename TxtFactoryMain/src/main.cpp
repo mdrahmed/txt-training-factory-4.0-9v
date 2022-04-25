@@ -138,8 +138,11 @@ public:
 			//SPDLOG_LOGGER_TRACE(spdlog::get("console"), "Update 1",0);
 			panpos_last = (float)_subject->getPosPanRel();
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "panpos_last = {}", panpos_last);
+			spdlog::get("file_logger")->debug("panpos_last = {}", panpos_last);
 			tiltpos_last = (float)_subject->getPosTiltRel();
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "tiltpos_last = {}", tiltpos_last);
+			spdlog::get("file_logger")->debug("tiltpos_last = {}", tiltpos_last);
+			
 			//SPDLOG_LOGGER_TRACE(spdlog::get("console"), "Update 2",0);
 		}
 	}
@@ -190,6 +193,9 @@ public:
 			double wait_ms = period_ms - secs.count()/1000.0;
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "fps:{} diff_s:{} period_ms:{} wait_ms:{}",
 					1./secs.count(), secs.count(), period_ms, wait_ms);
+			spdlog::get("file_logger")->debug("fps:{} diff_s:{} period_ms:{} wait_ms:{}",
+					1./secs.count(), secs.count(), period_ms, wait_ms);
+			
 			startLast = start;
 #endif
 			if (mleds==1) {
@@ -258,6 +264,8 @@ public:
 			spdlog::get("file_logger")->info("BME680 diff:{}", diff);
 			if ((timestamp_bme680 == 0) || (diff >= period_bme680)) {
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "timestamp_bme680:{} period_bme680:{}", timestamp_bme680/1000000000., period_bme680);
+				spdlog::get("file_logger")->debug("timestamp_bme680:{} period_bme680:{}", timestamp_bme680/1000000000., period_bme680);
+				
 				timestamp_bme680 = _subject->_timestamp;
 				long timeout_ms = TIMEOUT_CONNECTION_MS;//TODO1000L*period_bme680;
 				assert(pcli);
@@ -365,6 +373,8 @@ class callback : public virtual mqtt::callback
 	void message_arrived(mqtt::const_message_ptr msg) override {
 		assert(msg);
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "message_arrived  message:{} payload:{}", msg->get_topic(), msg->to_string());
+		spdlog::get("file_logger")->debug("message_arrived  message:{} payload:{}", msg->get_topic(), msg->to_string());
+		
 		//BUGFIX: msg->get_topic() is empty
 		//FIX paho.mqtt.cpp: https://github.com/eclipse/paho.mqtt.c/issues/440#issuecomment-380161713
 
@@ -372,22 +382,29 @@ class callback : public virtual mqtt::callback
 
 		if (msg->get_topic() == TOPIC_CONFIG_LINK) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED link:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED link:{}", msg->get_topic());
+			
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
 				ssin >> root;
 				std::string smessage = root["message"].asString();
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  message:{}", smessage);
+				spdlog::get("file_logger")->debug("  message:{}", smessage);
+				
 				int code = -1;
 				if (root.isMember("code")) {
 					code = root["code"].asInt();
 				}
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  code:{}", code);
+				spdlog::get("file_logger")->debug("  code:{}", code);
+				
 			} catch (const Json::RuntimeError& exc) {
 				std::cout << "Error: " << exc.what() << std::endl;
 			}
 		} else if (msg->get_topic() == TOPIC_LOCAL_BROADCAST) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED local broadcast:{}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED local broadcast:{}", msg->get_topic());
 			std::stringstream ssin(msg->to_string());
 			Json::Value root;
 			try {
@@ -399,6 +416,8 @@ class callback : public virtual mqtt::callback
 				std::string softwareVersion = root["softwareVersion"].asString();
 				std::string message = root["message"].asString();
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  station:{} ts:{}", station, sts);
+				spdlog::get("file_logger")->debug("  station:{} ts:{}", station, sts);
+				
 				if (station=="MPO") {
 					sts_mpo = sts;
 					std::cout << "ts_mpo: " << sts_mpo << std::endl;
@@ -436,8 +455,10 @@ class callback : public virtual mqtt::callback
 				std::cout << "Error: " << exc.what() << std::endl;
 			}
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OK.", 0);
+			spdlog::get("file_logger")->debug("OK.", 0);
 		} else if (msg->get_topic() == TOPIC_CONFIG_BME680) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED bme680 config: {}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED bme680 config: {}", msg->get_topic());
 			if (force_max_rate) {
 				std::cout << "force_max_rate=true: ignoring bme680 config" << std::endl;
 			} else {
@@ -449,10 +470,14 @@ class callback : public virtual mqtt::callback
 					if (root.isMember("period")) {
 						period = root["period"].asDouble();
 						SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  period: {}", period);
+						spdlog::get("file_logger")->debug("  period: {}", period);
+						
 					}
 					if (period >= 3.0) {
 						period_bme680 = period;
 						SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "Setting period_bme680={}s",period_bme680);
+						spdlog::get("file_logger")->debug("Setting period_bme680={}s",period_bme680);
+						
 					} else if (period >= 1.0) {
 						period_bme680 = 3.0;
 						spdlog::get("console")->warn("WRONG CONFIG: period should be >= 3.0. Setting period_bme680=3.0s",0);
@@ -464,6 +489,8 @@ class callback : public virtual mqtt::callback
 			}
 		} else if (msg->get_topic() == TOPIC_CONFIG_LDR) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED ldr config: {}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED ldr config: {}", msg->get_topic());
+			
 			if (force_max_rate) {
 				std::cout << "force_max_rate=true: ignoring ldr config" << std::endl;
 			} else {
@@ -475,10 +502,13 @@ class callback : public virtual mqtt::callback
 					if (root.isMember("period")) {
 						period = root["period"].asDouble();
 						SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  period: {}", period);
+						spdlog::get("file_logger")->debug("  period: {}", period);
 					}
 					if (period >= 1.0) {
 						period_ldr = period;
 						SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "Setting period_ldr={}s",period_ldr);
+						spdlog::get("file_logger")->debug("Setting period_ldr={}s",period_ldr);
+						
 					} else {
 						spdlog::get("console")->warn("WRONG CONFIG: period >= 1.0. Setting period_ldr=1.0s",0);
 						spdlog::get("file_logger")->warn("WRONG CONFIG: period >= 1.0. Setting period_ldr=1.0s",0);
@@ -489,6 +519,8 @@ class callback : public virtual mqtt::callback
 			}
 		} else if (msg->get_topic() == TOPIC_CONFIG_CAM) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED cam config: {}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED cam config: {}", msg->get_topic());
+			
 			if (force_max_rate) {
 				std::cout << "force_max_rate=true: ignoring cam config" << std::endl;
 			} else {
@@ -498,24 +530,31 @@ class callback : public virtual mqtt::callback
 					ssin >> root;
 					bool bon = root["on"].asBool();
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  on: {}", bon);
+					spdlog::get("file_logger")->debug("  on: {}", bon);
+					
 					double fps = -1.0;
 					if (root.isMember("fps")) {
 						fps = root["fps"].asDouble();
 						SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  fps: {}", fps);
+						spdlog::get("file_logger")->debug("  fps: {}", fps);
 					}
 					if (fps > 0.0) {
 						//assert(pCam);
 						if (pCam) pCam->setFps(fps);
 						SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "CONFIG: fps:{}",fps);
+						spdlog::get("file_logger")->debug("CONFIG: fps:{}",fps);
 					}
 					if (bon) {
 						//assert(pCam);
 						if (pCam) pCam->start();
 						SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "CONFIG: start camera",0);
+						spdlog::get("file_logger")->debug("CONFIG: start camera",0);
+						
 					} else {
 						//assert(pCam);
 						if (pCam) pCam->stop();
 						SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "CONFIG: stop camera",0);
+						spdlog::get("file_logger")->debug("CONFIG: stop camera",0);
 					}
 				} catch (const Json::RuntimeError& exc) {
 					std::cout << "Error: " << exc.what() << std::endl;
@@ -523,6 +562,8 @@ class callback : public virtual mqtt::callback
 			}
 		} else if (msg->get_topic() == TOPIC_OUTPUT_PTU) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED PTU control: {}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED PTU control: {}", msg->get_topic());
+			
 			if (pPtuControl) {
 				std::stringstream ssin(msg->to_string());
 				Json::Value root;
@@ -530,17 +571,22 @@ class callback : public virtual mqtt::callback
 					ssin >> root;
 					std::string scmd = root["cmd"].asString();
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  cmd:{}", scmd);
+					spdlog::get("file_logger")->debug("  cmd:{}", scmd);
+					
 					float degree = 0.f;
 					if (root.isMember("degree")) {
 						degree = root["degree"].asFloat();
 						SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  degree:{}", degree);
+						spdlog::get("file_logger")->debug("  degree:{}", degree);
 					}
 					assert(pPtuControl);
 					int steps = DEGREE2STEPS*degree;
 					if (pPtuControl->executeCmd(scmd, steps)) {
 						SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "executeCmd (TRUE): scmd:{} degree:{} steps:{}", scmd, degree, steps);
+						spdlog::get("file_logger")->debug("executeCmd (TRUE): scmd:{} degree:{} steps:{}", scmd, degree, steps);
 					} else {
 						SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "executeCmd (FALSE)",0);
+						spdlog::get("file_logger")->debug("executeCmd (FALSE)",0);
 					}
 				} catch (const Json::RuntimeError& exc) {
 					std::cout << "Error: " << exc.what() << std::endl;
@@ -552,31 +598,38 @@ class callback : public virtual mqtt::callback
 		else if (msg->get_topic() == TOPIC_INPUT_STATE_HBW)
 		{
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED input state HBW: {}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED input state HBW: {}", msg->get_topic());
+			
 			updateLEDs(msg, "hbw");
 		}
 		else if (msg->get_topic() == TOPIC_INPUT_STATE_VGR)
 		{
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED input state VGR: {}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED input state VGR: {}", msg->get_topic());
 			updateLEDs(msg, "vgr");
 		}
 		else if (msg->get_topic() == TOPIC_INPUT_STATE_MPO)
 		{
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED input state MPO: {}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED input state MPO: {}", msg->get_topic());
 			updateLEDs(msg, "mpo");
 		}
 		else if (msg->get_topic() == TOPIC_INPUT_STATE_SLD)
 		{
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED input state SLD: {}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED input state SLD: {}", msg->get_topic());
 			updateLEDs(msg, "sld");
 		}
 		else if (msg->get_topic() == TOPIC_INPUT_STATE_DSI)
 		{
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED input state DSI: {}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED input state DSI: {}", msg->get_topic());
 			updateLEDs(msg, "dsi");
 		}
 		else if (msg->get_topic() == TOPIC_INPUT_STATE_DSO)
 		{
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "DETECTED input state DSO: {}", msg->get_topic());
+			spdlog::get("file_logger")->debug("DETECTED input state DSO: {}", msg->get_topic());
 			updateLEDs(msg, "dso");
 		} else {
 			std::cout << "Unknown topic: " << msg->get_topic() << std::endl;
@@ -595,6 +648,7 @@ class callback : public virtual mqtt::callback
 			ssin >> root;
 			int code = root["code"].asInt();
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "  code: {}", code);
+			spdlog::get("file_logger")->debug("  code: {}", code);
 
 			//update lastCode
 			if (station=="hbw") {
@@ -895,12 +949,15 @@ int main(int argc, char* argv[])
 						//SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "LDR diff:{}s", diff);
 						if ((timestamp_ldr == 0) || (diff >= period_ldr)) {
 							SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "timestamp_ldr:{} period_ldr:{}", timestamp_ldr, period_ldr);
+							spdlog::get("file_logger")->debug("timestamp_ldr:{} period_ldr:{}", timestamp_ldr, period_ldr);
 							timestamp_ldr = timestamp_s;
 
 							//LDR I3
 							int16_t ldr = pTArea->ftX1in.uni[2];
 							firstvalue = false;
 							SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "ldr: {}", ldr);
+							spdlog::get("file_logger")->debug("ldr: {}", ldr);
+							
 							if (!firstvalue) {//Den ersten Wert verwerfen, da immer ungültig.
 								long timeout_ms = TIMEOUT_CONNECTION_MS;//TODO period_ldr*1000;
 								mqttclient.publishLDR(timestamp_s, ldr, timeout_ms);
@@ -927,6 +984,8 @@ int main(int argc, char* argv[])
 							}
 							SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "panpos_published_last:{} tiltpos_published_last:{}",
 									panpos_published_last, tiltpos_published_last);
+							spdlog::get("file_logger")->debug("panpos_published_last:{} tiltpos_published_last:{}",
+									panpos_published_last,tiltpos_published_last);
 						}
 
 						std::this_thread::sleep_for(std::chrono::milliseconds(50));

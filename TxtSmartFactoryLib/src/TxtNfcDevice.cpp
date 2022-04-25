@@ -118,27 +118,37 @@ std::string TxtNfcDevice::readTagsGetUID()
 	if (!opened)
 	{
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "Open nfc device first!",0);
+		spdlog::get("file_logger")->debug("Open nfc device first!",0);
 		return "";
 	}
 
 	if (!(tags = freefare_get_tags(pnd))) {
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "Error listing tags.",0);
+		spdlog::get("file_logger")->debug("Error listing tags.",0);
 	} else {
 		for (int i = 0; tags[i]; i++) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "tags i: {}",i);
+			spdlog::get("file_logger")->debug("tags i: {}",i);
+			
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "freefare_get_tag_type: {}",(int)freefare_get_tag_type(tags[i]));
+			spdlog::get("file_logger")->debug("freefare_get_tag_type: {}",(int)freefare_get_tag_type(tags[i]));
+			
 			switch (freefare_get_tag_type(tags[i])) {
 			case NTAG_21x:
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "NTAG_21x",0);
+				spdlog::get("file_logger")->debug("NTAG_21x",0);
 				break;
 			case MIFARE_ULTRALIGHT:
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "MIFARE_ULTRALIGHT",0);
+				spdlog::get("file_logger")->debug("MIFARE_ULTRALIGHT",0);
 				break;
 			case MIFARE_CLASSIC_1K:
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "MIFARE_CLASSIC_1K",0);
+				spdlog::get("file_logger")->debug("MIFARE_CLASSIC_1K",0);
 				break;
 			default:
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "continue",0);
+				spdlog::get("file_logger")->debug("continue",0);
 				continue;
 			}
 			FreefareTag tag = tags[i];
@@ -146,6 +156,7 @@ std::string TxtNfcDevice::readTagsGetUID()
 			char *tag_uid = freefare_get_tag_uid(tag);
 			uid = std::string(tag_uid);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "Tag with UID {}",tag_uid);
+			spdlog::get("file_logger")->debug("Tag with UID {}",tag_uid);
 			free(tag_uid);
 		}
 	}
@@ -168,11 +179,13 @@ bool TxtNfcDevice::eraseTags()
 	if (!opened)
 	{
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "Open nfc device first!",0);
+		spdlog::get("file_logger")->debug("Open nfc device first!",0);
 		return false;
 	}
 
 	if (!(tags = freefare_get_tags(pnd))) {
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "Error listing tags.",0);
+		spdlog::get("file_logger")->debug("Error listing tags.",0);
 	} else {
 		for (int i = 0; tags[i]; i++) {
 			switch (freefare_get_tag_type(tags[i])) {
@@ -188,6 +201,7 @@ bool TxtNfcDevice::eraseTags()
 			printf("Tag with UID %s is a %s\n", tag_uid, freefare_get_tag_friendly_name(tags[i]));
 			if (ntag21x_connect(tag) < 0)
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "Error connecting to tag.",0);
+				spdlog::get("file_logger")->debug("Error connecting to tag.",0);
 
 			/* Get information about tag
 			 * MUST do, because here we are recognizing tag subtype (NTAG213,NTAG215,NTAG216), and gathering all parameters */
@@ -199,6 +213,7 @@ bool TxtNfcDevice::eraseTags()
 
 			//---
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "...",0);
+			spdlog::get("file_logger")->debug("...",0);
 			uint8_t data [4] = {0x00, 0x00, 0x00, 0x00}; // Data to write on tag
 			// writing to tag 4 bytes on page 0x27 (check specs for NTAG21x before changing page number !!!)
 
@@ -239,22 +254,30 @@ std::string TxtNfcDevice::readTags()
 	if (!opened)
 	{
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "Open nfc device first!",0);
+		spdlog::get("file_logger")->debug("Open nfc device first!",0);
 		return "";
 	}
 
 	if (!(tags = freefare_get_tags(pnd))) {
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "Error listing tags.",0);
+		spdlog::get("file_logger")->debug("Error listing tags.",0);
 	} else {
 		for (int i = 0; tags[i]; i++) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "tags i: {}",i);
+			spdlog::get("file_logger")->debug("tags i: {}",i);
+			
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "freefare_get_tag_type: {}",(int)freefare_get_tag_type(tags[i]));
+			spdlog::get("file_logger")->debug("freefare_get_tag_type: {}",(int)freefare_get_tag_type(tags[i]));
+			
 			switch (freefare_get_tag_type(tags[i])) {
 			case NTAG_21x:
 			case MIFARE_ULTRALIGHT:
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "break",0);
+				spdlog::get("file_logger")->debug("break",0);
 				break;
 			default:
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "continue",0);
+				spdlog::get("file_logger")->debug("continue",0);
 				continue;
 			}
 			FreefareTag tag = tags[i];
@@ -263,8 +286,10 @@ std::string TxtNfcDevice::readTags()
 			tuid = tag_uid;
 			//printf("Tag with UID %s is a %s\n", tag_uid, freefare_get_tag_friendly_name(tags[i]));
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "Tag with UID {} is a {}",tag_uid, freefare_get_tag_friendly_name(tags[i]));
+			spdlog::get("file_logger")->debug("Tag with UID {} is a {}",tag_uid, freefare_get_tag_friendly_name(tags[i]));
 			if (ntag21x_connect(tag) < 0)
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "Error connecting to tag.",0);
+				spdlog::get("file_logger")->debug("Error connecting to tag.",0);
 
 			/* Get information about tag
 			 * MUST do, because here we are recognizing tag subtype (NTAG213,NTAG215,NTAG216), and gathering all parameters */
@@ -276,6 +301,7 @@ std::string TxtNfcDevice::readTags()
 
 			//---
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "...",0);
+			spdlog::get("file_logger")->debug("...",0);
 			uint8_t buffer[36*4]; // Buffer for reading data from tag
 			res = ntag21x_fast_read(tag, 0x4, 0x27, buffer);
 			if (res < 0) {
@@ -330,11 +356,13 @@ bool TxtNfcDevice::writeTags(TxtWorkpiece wp, std::vector<uTS> vuts, uint8_t mas
 	if (!opened)
 	{
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "Open nfc device first!",0);
+		spdlog::get("file_logger")->debug("Open nfc device first!",0);
 		return false;
 	}
 
 	if (!(tags = freefare_get_tags(pnd))) {
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "Error listing tags.",0);
+		spdlog::get("file_logger")->debug("Error listing tags.",0);
 	} else {
 		for (int i = 0; tags[i]; i++) {
 			switch (freefare_get_tag_type(tags[i])) {
@@ -350,6 +378,7 @@ bool TxtNfcDevice::writeTags(TxtWorkpiece wp, std::vector<uTS> vuts, uint8_t mas
 			printf("Tag with UID %s is a %s\n", tag_uid, freefare_get_tag_friendly_name(tags[i]));
 			if (ntag21x_connect(tag) < 0)
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "Error connecting to tag.",0);
+				spdlog::get("file_logger")->debug("Error connecting to tag.",0);
 
 			/* Get information about tag
 			 * MUST do, because here we are recognizing tag subtype (NTAG213,NTAG215,NTAG216), and gathering all parameters */
@@ -361,6 +390,7 @@ bool TxtNfcDevice::writeTags(TxtWorkpiece wp, std::vector<uTS> vuts, uint8_t mas
 
 			//---
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "write header",0);
+				spdlog::get("file_logger")->debug("write header",0);
 			uint8_t data4[4]; // Data to write on tag
 			data4[0] = (TxtWPState_t)wp.state;
 			data4[1] = (TxtWPType_t)wp.type;
@@ -375,6 +405,7 @@ bool TxtNfcDevice::writeTags(TxtWorkpiece wp, std::vector<uTS> vuts, uint8_t mas
 			}
 			//---
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "write vts",0);
+			spdlog::get("file_logger")->debug("write vts",0);
 			for(unsigned int i = 0; i < vuts.size(); i++)
 			{
 				char sts[25];
@@ -384,6 +415,7 @@ bool TxtNfcDevice::writeTags(TxtWorkpiece wp, std::vector<uTS> vuts, uint8_t mas
 				if (((mask_ts >> i) & 0x1) == 1)
 				{
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "write {}",i);
+					spdlog::get("file_logger")->debug("write {}",i);
 
 					uint8_t data[4]; // Data to write on tag
 					data[0] = vuts[i].u8[0];

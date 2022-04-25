@@ -41,6 +41,7 @@ bool TxtPanTiltUnit::init() {
 	spdlog::get("file_logger")->trace("init");
 	status = PTU_NOHOME;
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "status=PTU_NOHOME");
+	spdlog::get("file_logger")->debug("status=PTU_NOHOME");
 	return true;
 }
 
@@ -102,15 +103,19 @@ void TxtPanTiltUnit::moveLeft(uint8_t ch, uint16_t steps, int16_t speed, uint16_
 	}
 	int16_t posa = *p;
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "posa: {}", posa);
+	spdlog::get("file_logger")->debug("posa: {}", posa);
 	//int16_t lastCounter = 0;
 
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "setup distance:{}", steps);
+	spdlog::get("file_logger")->debug("setup distance:{}", steps);
+	
 	pT->pTArea->ftX1out.distance[ch] = steps; // Distance to drive Motor 1 [0]
 	pT->pTArea->ftX1out.motor_ex_cmd_id[ch]++; // Set new Distance Value for Motor 1 [0]
 	pT->pTArea->ftX1out.duty[ch*2] = speed; // Switch Motor 1 ( O1 [0] ) on with PWM Value 512 (= max speed)
 	pT->pTArea->ftX1out.duty[ch*2+1] = 0; // Switch Motor 1 ( O2 [1] ) with minus
 	status = PTU_MOVING;
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "setup duty left");
+	spdlog::get("file_logger")->debug("setup duty left");
 
 	auto start = std::chrono::system_clock::now();
 	while (pT->pTArea->ftX1in.motor_ex_cmd_id[ch] < pT->pTArea->ftX1out.motor_ex_cmd_id[ch])
@@ -119,6 +124,8 @@ void TxtPanTiltUnit::moveLeft(uint8_t ch, uint16_t steps, int16_t speed, uint16_
 		if (pT->pTArea->ftX1in.uni[ch] == 1)
 		{   // Input IX on Master Interface is "1"
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "end switch:{} duty 0 0", ch);
+			spdlog::get("file_logger")->debug("end switch:{} duty 0 0", ch);
+			
 			pT->pTArea->ftX1out.duty[ch*2] = 0;
 			pT->pTArea->ftX1out.duty[ch*2+1] = 0;
 			break;
@@ -126,6 +133,8 @@ void TxtPanTiltUnit::moveLeft(uint8_t ch, uint16_t steps, int16_t speed, uint16_
 		//check stop req
 		if (stopAllReq) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "stopAllReq=TRUE");
+			spdlog::get("file_logger")->debug("stopAllReq=TRUE");
+			
 			setMotorsOff();
 			break;
 		}
@@ -145,13 +154,20 @@ void TxtPanTiltUnit::moveLeft(uint8_t ch, uint16_t steps, int16_t speed, uint16_
 	}
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OutExCmd:{} InExCmd:{}  Counter:{}",
 			pT->pTArea->ftX1out.motor_ex_cmd_id[ch], pT->pTArea->ftX1in.motor_ex_cmd_id[ch], pT->pTArea->ftX1in.counter[ch]);
+	spdlog::get("file_logger")->debug("OutExCmd:{} InExCmd:{}  Counter:{}",
+			pT->pTArea->ftX1out.motor_ex_cmd_id[ch], pT->pTArea->ftX1in.motor_ex_cmd_id[ch], pT->pTArea->ftX1in.counter[ch]);
+	
 	//set new pos
 	if (posa >= pT->pTArea->ftX1in.counter[ch]) {
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "posa >= pT->pTArea->ftX1in.counter[ch:{}]", ch);
+		spdlog::get("file_logger")->debug("posa >= pT->pTArea->ftX1in.counter[ch:{}]", ch);
+		
 		*p = posa - pT->pTArea->ftX1in.counter[ch];
 	} else {
 		status = PTU_ERROR;
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "status = PTU_ERROR: *p:{} posa:{} pT->pTArea->ftX1in.counter[ch]:{}", *p, posa, pT->pTArea->ftX1in.counter[ch]);
+		spdlog::get("file_logger")->debug("status = PTU_ERROR: *p:{} posa:{} pT->pTArea->ftX1in.counter[ch]:{}", *p, posa, pT->pTArea->ftX1in.counter[ch]);
+		
 		return;
 	}
 	//reset counter
@@ -180,14 +196,18 @@ void TxtPanTiltUnit::moveRight(uint8_t ch, uint16_t steps, int16_t speed, uint16
 	}
 	int16_t posa = *p;
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "posa: {}", posa);
+	spdlog::get("file_logger")->debug("posa: {}", posa);
 
 	pT->pTArea->ftX1out.distance[ch] = steps; // Distance to go back
 	pT->pTArea->ftX1out.motor_ex_cmd_id[ch]++; // Set new Distance Value for Motor 1 [0]
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "setup distance:{}", steps);
+	spdlog::get("file_logger")->debug("setup distance:{}", steps);
+	
 	pT->pTArea->ftX1out.duty[ch*2] = 0; // Switch Motor 1 ( O1 [0] ) with minus
 	pT->pTArea->ftX1out.duty[ch*2+1] = speed; // Switch Motor 1 ( O2 [1] ) on with PWM Value 512 (max speed)
 	status = PTU_MOVING;
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "setup duty right");
+	spdlog::get("file_logger")->debug("setup duty right");
 
 	auto start = std::chrono::system_clock::now();
 	while (pT->pTArea->ftX1in.motor_ex_cmd_id[ch] < pT->pTArea->ftX1out.motor_ex_cmd_id[ch])
@@ -195,6 +215,8 @@ void TxtPanTiltUnit::moveRight(uint8_t ch, uint16_t steps, int16_t speed, uint16
 		//check end pos
 		if (((posa+pT->pTArea->ftX1in.counter[ch])) >= posEnd) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "((posa+pT->pTArea->ftX1in.counter[ch:{}])) >= posEnd:{}", ch, posEnd);
+			spdlog::get("file_logger")->debug("((posa+pT->pTArea->ftX1in.counter[ch:{}])) >= posEnd:{}", ch, posEnd);
+			
 			pT->pTArea->ftX1out.duty[ch*2] = 0; // Switch Motor 1 ( O1 [0] ) with minus
 			pT->pTArea->ftX1out.duty[ch*2+1] = 0; // Switch Motor 1 ( O2 [1] ) on with PWM Value 512 (max speed)
 			break;
@@ -202,6 +224,8 @@ void TxtPanTiltUnit::moveRight(uint8_t ch, uint16_t steps, int16_t speed, uint16
 		//check stop req
 		if (stopAllReq) {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "stopAllReq=TRUE");
+			spdlog::get("file_logger")->debug("stopAllReq=TRUE");
+			
 			setMotorsOff();
 			break;
 		}
@@ -221,6 +245,9 @@ void TxtPanTiltUnit::moveRight(uint8_t ch, uint16_t steps, int16_t speed, uint16
 	}
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "OutExCmd:{} InExCmd:{}  Counter:{}",
 			pT->pTArea->ftX1out.motor_ex_cmd_id[ch], pT->pTArea->ftX1in.motor_ex_cmd_id[ch], pT->pTArea->ftX1in.counter[ch]);
+	spdlog::get("file_logger")->debug("OutExCmd:{} InExCmd:{}  Counter:{}",
+			pT->pTArea->ftX1out.motor_ex_cmd_id[ch], pT->pTArea->ftX1in.motor_ex_cmd_id[ch], pT->pTArea->ftX1in.counter[ch]);
+			
 	//set new pos
 	*p = posa + pT->pTArea->ftX1in.counter[ch];
 	pT->pTArea->ftX1out.cnt_reset_cmd_id[ch]++;
@@ -235,6 +262,7 @@ void TxtPanTiltUnit::movePanLeft(uint16_t steps) {
 	if (status == PTU_READY) {
 		posPan = p;
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "posPan:{}", posPan);
+		spdlog::get("file_logger")->debug("posPan:{}", posPan);
 		Notify();
 	}
 }
@@ -247,6 +275,7 @@ void TxtPanTiltUnit::movePanRight(uint16_t steps) {
 	if (status == PTU_READY) {
 		posPan = p;
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "posPan:{}", posPan);
+		spdlog::get("file_logger")->debug("posPan:{}", posPan);
 		Notify();
 	}
 }
@@ -259,6 +288,7 @@ void TxtPanTiltUnit::moveTiltUp(uint16_t steps) {
 	if (status == PTU_READY) {
 		posTilt = p;
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "posTilt:{}", posTilt);
+		spdlog::get("file_logger")->debug("posTilt:{}", posTilt);
 		Notify();
 	}
 }
@@ -271,6 +301,8 @@ void TxtPanTiltUnit::moveTiltDown(uint16_t steps) {
 	if (status == PTU_READY) {
 		posTilt = p;
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "posTilt:{}", posTilt);
+		spdlog::get("file_logger")->debug("posTilt:{}", posTilt);
+		
 		Notify();
 	}
 }
@@ -280,14 +312,17 @@ bool TxtPanTiltUnit::movePanPos(uint16_t pPan) {
 	spdlog::get("file_logger")->trace("movePanPos pPan:{}", pPan);
 	if (pPan == posPan) {
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pPan:{} == posPan:{}", pPan, posPan);
+		spdlog::get("file_logger")->debug("pPan:{} == posPan:{}", pPan, posPan);
 		return true;
 	} else if (pPan > posPan) {
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pPan:{} > posPan:{}", pPan, posPan);
+		spdlog::get("file_logger")->debug("pPan:{} > posPan:{}", pPan, posPan);
 		setStepPan(pPan-posPan);
 		moveStepPanRight();
 		return true;
 	} else if (pPan < posPan) {
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pPan:{} < posPan:{}", pPan, posPan);
+		spdlog::get("file_logger")->debug("pPan:{} < posPan:{}", pPan, posPan);
 		setStepPan(posPan-pPan);
 		moveStepPanLeft();
 		return true;
@@ -300,14 +335,17 @@ bool TxtPanTiltUnit::moveTiltPos(uint16_t pTilt) {
 	spdlog::get("file_logger")->trace("moveTiltPos pTilt:{}", pTilt);
 	if (pTilt == posTilt) {
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pTilt:{} == posTilt:{}", pTilt, posTilt);
+		spdlog::get("file_logger")->debug("pTilt:{} == posTilt:{}", pTilt, posTilt);
 		return true;
 	} else if (pTilt > posTilt) {
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pTilt:{} > posTilt:{}", pTilt, posTilt);
+		spdlog::get("file_logger")->debug("pTilt:{} > posTilt:{}", pTilt, posTilt);
 		setStepTilt(pTilt-posTilt);
 		moveStepTiltUp();
 		return true;
 	} else if (pTilt < posTilt) {
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pTilt:{} < posTilt:{}", pTilt, posTilt);
+		spdlog::get("file_logger")->debug("pTilt:{} < posTilt:{}", pTilt, posTilt);
 		setStepTilt(posTilt-pTilt);
 		moveStepTiltDown();
 		return true;
@@ -334,6 +372,7 @@ void TxtPanTiltUnit::moveHome() {
 	spdlog::get("file_logger")->trace("moveHome");
 	/*TODO if (status != PTU_READY) {
     	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "status != PTU_READY, return");
+    	spdlog::get("file_logger")->debug("status != PTU_READY, return");
     	return;
     }*/
 
@@ -373,6 +412,7 @@ void TxtPanTiltUnit::moveHome() {
 			setMotorsOff();
 			status = PTU_NOHOME;
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "stopAllReq: status == PTU_NOHOME");
+			spdlog::get("file_logger")->debug("stopAllReq: status == PTU_NOHOME");
 			break;
 		}
 		//check timeout
@@ -395,6 +435,7 @@ void TxtPanTiltUnit::moveHome() {
 	posTilt = 0;
 	status = PTU_READY;
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "status == PTU_READY");
+	spdlog::get("file_logger")->debug("status == PTU_READY");
 	Notify();
 }
 
@@ -541,6 +582,7 @@ void TxtPanTiltUnitController::run() {
 	{
 		if(scmd=="stop") {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==stop START");
+			spdlog::get("file_logger")->debug("### scmd==stop START");
 			//pthread_mutex_lock(&m_mutex);
 			//TODO: ptu->stop();
 			std::cout << "NOT IMPLEMENTED" << std::endl;
@@ -549,8 +591,10 @@ void TxtPanTiltUnitController::run() {
 			steps = 0;
 			//pthread_mutex_unlock(&m_mutex);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==stop END");
+			spdlog::get("file_logger")->debug("### scmd==stop END");
 		} else if (scmd=="home") { //TODO home -> center
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==center START");
+			spdlog::get("file_logger")->debug("### scmd==center START");
 			pthread_mutex_lock(&m_mutex);
 			if (mode >= 3) {
 				busy = true;
@@ -561,8 +605,10 @@ void TxtPanTiltUnitController::run() {
 			steps = 0;
 			pthread_mutex_unlock(&m_mutex);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==center END");
+			spdlog::get("file_logger")->debug("### scmd==center END");
 		} else if (scmd=="start_pan") {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==start_pan START");
+			spdlog::get("file_logger")->debug("### scmd==start_pan START");
 			pthread_mutex_lock(&m_mutex);
 			if (mode >= 2) {
 				busy = true;
@@ -573,8 +619,10 @@ void TxtPanTiltUnitController::run() {
 			steps = 0;
 			pthread_mutex_unlock(&m_mutex);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==start_pan END");
+			spdlog::get("file_logger")->debug("### scmd==start_pan END");
 		} else if (scmd=="end_pan") {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==end_pan START");
+			spdlog::get("file_logger")->debug("### scmd==end_pan START");
 			pthread_mutex_lock(&m_mutex);
 			if (mode >= 3) {
 				busy = true;
@@ -585,8 +633,10 @@ void TxtPanTiltUnitController::run() {
 			steps = 0;
 			pthread_mutex_unlock(&m_mutex);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==end_pan END");
+			spdlog::get("file_logger")->debug("### scmd==end_pan END");
 		} else if (scmd=="start_tilt") {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==start_tilt START");
+			spdlog::get("file_logger")->debug("### scmd==start_tilt START");
 			pthread_mutex_lock(&m_mutex);
 			if (mode >= 2) {
 				busy = true;
@@ -597,8 +647,10 @@ void TxtPanTiltUnitController::run() {
 			steps = 0;
 			pthread_mutex_unlock(&m_mutex);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==start_tilt END");
+			spdlog::get("file_logger")->debug("### scmd==start_tilt END");
 		} else if (scmd=="end_tilt") {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==end_tilt START");
+			spdlog::get("file_logger")->debug("### scmd==end_tilt START");
 			pthread_mutex_lock(&m_mutex);
 			if (mode >= 3) {
 				busy = true;
@@ -609,8 +661,10 @@ void TxtPanTiltUnitController::run() {
 			steps = 0;
 			pthread_mutex_unlock(&m_mutex);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==end_tilt END");
+			spdlog::get("file_logger")->debug("### scmd==end_tilt END");
 		} else if (scmd=="relmove_left") {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==relmove_left START");
+			spdlog::get("file_logger")->debug("### scmd==relmove_left START");
 			pthread_mutex_lock(&m_mutex);
 			if (mode >= 1) {
 				busy = true;
@@ -622,8 +676,10 @@ void TxtPanTiltUnitController::run() {
 			steps = 0;
 			pthread_mutex_unlock(&m_mutex);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==relmove_left END");
+			spdlog::get("file_logger")->debug("### scmd==relmove_left END");
 		} else if (scmd=="relmove_right") {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==relmove_right START");
+			spdlog::get("file_logger")->debug("### scmd==relmove_right START");
 			pthread_mutex_lock(&m_mutex);
 			if (mode >= 1) {
 				busy = true;
@@ -635,8 +691,10 @@ void TxtPanTiltUnitController::run() {
 			steps = 0;
 			pthread_mutex_unlock(&m_mutex);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==relmove_right END");
+			spdlog::get("file_logger")->debug("### scmd==relmove_right END");
 		} else if (scmd=="relmove_up") {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==relmove_up START");
+			spdlog::get("file_logger")->debug("### scmd==relmove_up START");
 			pthread_mutex_lock(&m_mutex);
 			if (mode >= 1) {
 				busy = true;
@@ -648,8 +706,10 @@ void TxtPanTiltUnitController::run() {
 			steps = 0;
 			pthread_mutex_unlock(&m_mutex);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==relmove_up END");
+			spdlog::get("file_logger")->debug("### scmd==relmove_up END");
 		} else if (scmd=="relmove_down") {
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==relmove_down START");
+			spdlog::get("file_logger")->debug("### scmd==relmove_down START");
 			pthread_mutex_lock(&m_mutex);
 			if (mode >= 1) {
 				busy = true;
@@ -661,6 +721,7 @@ void TxtPanTiltUnitController::run() {
 			steps = 0;
 			pthread_mutex_unlock(&m_mutex);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "### scmd==relmove_down END");
+			spdlog::get("file_logger")->debug("### scmd==relmove_down END");
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}

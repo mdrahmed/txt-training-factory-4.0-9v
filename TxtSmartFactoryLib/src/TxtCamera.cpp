@@ -148,6 +148,7 @@ void TxtCamera::run() {
 		spdlog::get("file_logger")->info("CAM 0: --- get frame");
 #endif
     		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock run");
+    		spdlog::get("file_logger")->debug("pthread_mutex_lock run");
     		pthread_mutex_lock(&m_mutex);
 #ifdef USE_YUYV
     		cap >> frame;
@@ -156,6 +157,8 @@ void TxtCamera::run() {
     		cap >> frame;
 #endif
     		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock run");
+    		spdlog::get("file_logger")->debug("pthread_mutex_unlock run");
+    		
     		//cv::flip(frame,frame,0);
     		//bool rg = cap.grab();
     		//bool rr = cap.retrieve(frame);
@@ -184,8 +187,12 @@ std::string TxtCamera::getDataString() {
 			spdlog::get("file_logger")->info("CAM 1: --- imencode jpg");
 #endif
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock getDataString");
+    			spdlog::get("file_logger")->debug("pthread_mutex_lock getDataString");
+    		
 			ret = cv::imencode(".jpg", frame, buf);
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock getDataString");
+    			spdlog::get("file_logger")->debug("pthread_mutex_unlock getDataString");
+    			
 		} catch (const cv::Exception& exc) {
 			std::cout << "Error: " << exc.what() << std::endl;
 			return "";
@@ -207,11 +214,17 @@ std::string TxtCamera::getDataString() {
 bool TxtCamera::writeFile(const std::string& filename) {
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "writeFile filename:{}", filename.c_str());
 	spdlog::get("file_logger")->trace("writeFile filename:{}", filename.c_str());
+	
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_lock writeFile");
+    	spdlog::get("file_logger")->debug("pthread_mutex_lock writeFile");
+    	
 	pthread_mutex_lock(&m_mutex);
 	bool ret = cv::imwrite(filename, frame);
 	pthread_mutex_unlock(&m_mutex);
+	
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "pthread_mutex_unlock writeFile");
+    	spdlog::get("file_logger")->debug("pthread_mutex_unlock writeFile");
+    	
 	return ret;
 }
 

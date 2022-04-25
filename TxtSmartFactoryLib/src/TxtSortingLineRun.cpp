@@ -168,6 +168,7 @@ void TxtSortingLine::fsmStep()
 		{
 			detectedColorValue = lastColorValue;
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "color value [min]: {} [{}]", lastColorValue, detectedColorValue);
+			spdlog::get("file_logger")->debug("color value [min]: {} [{}]", lastColorValue, detectedColorValue);
 		}
 		if (isEjectionTriggered())
 		{
@@ -198,6 +199,7 @@ void TxtSortingLine::fsmStep()
 		{
 		case WP_TYPE_WHITE:
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "WHITE",0);
+			spdlog::get("file_logger")->debug("WHITE",0);
 			if (u16Counter >= calibData.count_white)
 			{
 				FSM_TRANSITION( EJECTION_WHITE, color=blue, label='counter\nw' );
@@ -205,6 +207,7 @@ void TxtSortingLine::fsmStep()
 			break;
 		case WP_TYPE_RED:
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "RED",0);
+			spdlog::get("file_logger")->debug("RED",0);
 			if (u16Counter >= calibData.count_red)
 			{
 				FSM_TRANSITION( EJECTION_RED, color=blue, label='counter\nr' );
@@ -212,6 +215,7 @@ void TxtSortingLine::fsmStep()
 			break;
 		case WP_TYPE_BLUE:
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "BLUE",0);
+			spdlog::get("file_logger")->debug("BLUE",0);
 			if (u16Counter >= calibData.count_blue)
 			{
 				FSM_TRANSITION( EJECTION_BLUE, color=blue, label='counter\nb' );
@@ -225,6 +229,7 @@ void TxtSortingLine::fsmStep()
 			break;
 		}
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "counter: {}",u16Counter);
+		spdlog::get("file_logger")->debug("counter: {}",u16Counter);
 #ifdef __DOCFSM__
 		FSM_TRANSITION( CHECK_COUNT, color=blue, label='check\ncounter' );
 #endif
@@ -344,6 +349,7 @@ void TxtSortingLine::fsmStep()
 		{
 			detectedColorValue = lastColorValue;
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "color value [min]: {} [{}]", lastColorValue, detectedColorValue);
+			spdlog::get("file_logger")->debug("color value [min]: {} [{}]", lastColorValue, detectedColorValue);
 		}
 		if (isEjectionTriggered())
 		{
@@ -356,18 +362,21 @@ void TxtSortingLine::fsmStep()
 			case ft::TxtWPType_t::WP_TYPE_WHITE:
 				calibColorValues[0] = detectedColorValue;
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "value white: {}",calibColorValues[0]);
+				spdlog::get("file_logger")->debug("value white: {}",calibColorValues[0]);
 
 				calibColor = ft::TxtWPType_t::WP_TYPE_RED;
 				break;
 			case ft::TxtWPType_t::WP_TYPE_RED:
 				calibColorValues[1] = detectedColorValue;
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "value red: {}",calibColorValues[1]);
+				spdlog::get("file_logger")->debug("value red: {}",calibColorValues[1]);
 
 				calibColor = ft::TxtWPType_t::WP_TYPE_BLUE;
 				break;
 			case ft::TxtWPType_t::WP_TYPE_BLUE:
 				calibColorValues[2] = detectedColorValue;
 				SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "value blue: {}",calibColorValues[2]);
+				spdlog::get("file_logger")->debug("value blue: {}",calibColorValues[2]);
 				break;
 			default: assert( 0 ); break;
 			}
@@ -390,6 +399,7 @@ void TxtSortingLine::fsmStep()
 
 		//check finish
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "w:{} r:{} b:{}",calibColorValues[0],calibColorValues[1],calibColorValues[2]);
+		spdlog::get("file_logger")->debug("w:{} r:{} b:{}",calibColorValues[0],calibColorValues[1],calibColorValues[2]);
 		if ((calibColorValues[0] > 0)&&
 			(calibColorValues[1] > 0)&&
 			(calibColorValues[2] > 0))
@@ -397,6 +407,7 @@ void TxtSortingLine::fsmStep()
 			calibData.color_th[0] = (calibColorValues[0] + calibColorValues[1]) / 2;
 			calibData.color_th[1] = (calibColorValues[1] + calibColorValues[2]) / 2;
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "th1:{} th2:{}",calibData.color_th[0],calibData.color_th[1]);
+			spdlog::get("file_logger")->debug("th1:{} th2:{}",calibData.color_th[0],calibData.color_th[1]);
 			//check
 			if ((calibColorValues[0] < calibColorValues[1])&&
 				(calibColorValues[1] < calibColorValues[2])&&

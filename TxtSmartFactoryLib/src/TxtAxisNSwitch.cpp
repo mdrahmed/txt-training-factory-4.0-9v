@@ -58,6 +58,7 @@ void TxtAxisNSwitch::moveS2X(int idx)
 	}
 	uint8_t chS = chS2X[idx];
 	SPDLOG_LOGGER_DEBUG(spdlog::get("console_axes"), "{} chS[{}]",name,chS);
+	spdlog::get("file_logger")->debug("{} chS[{}]",name,chS);
 
 	//check switch ref
 	if (isSwitchPressed(chS))
@@ -91,6 +92,8 @@ void TxtAxisNSwitch::moveS2X(int idx)
 			setMotorOff();
 			stopReq = false;
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console_axes"), "{} stopReq",name);
+			spdlog::get("file_logger")->debug("{} stopReq",name);
+			
 			break;
 		}
 		//check timeout
@@ -111,6 +114,8 @@ void TxtAxisNSwitch::moveS2X(int idx)
 	} else {
 		std::string sst = toString(status);
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console_axes"), "{} setStatus:{}",name,sst);
+		spdlog::get("file_logger")->debug("{} setStatus:{}",name,sst);
+		
 		std::cout << "exit moveS2X 3" << std::endl;
 		spdlog::get("file_logger")->error("exit moveS2X 3",0);
 		exit(1);

@@ -226,6 +226,7 @@ void TxtVacuumGripperRobot::fsmStep()
 		{
 			std::string uid = dps.nfcReadUID();
 			SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "uid: {}",uid);
+			spdlog::get("file_logger")->debug("uid: {}",uid);
 			if (uid.length()==8) //command uid has length=8
 			{
 				SPDLOG_LOGGER_TRACE(spdlog::get("console"), "tag_uid: {}", uid);
@@ -352,7 +353,7 @@ void TxtVacuumGripperRobot::fsmStep()
 	case START_DELIVERY:
 	{
 		printState(START_DELIVERY);
-
+		spdlog::get("file_logger")->info("START_DELIVERY to HBW: ", START_DELIVERY);
 		setTarget("hbw");
 		moveDeliveryInAndGrip();
 		moveNFC();
@@ -672,6 +673,7 @@ void TxtVacuumGripperRobot::fsmStep()
 				case ft::TxtWPType_t::WP_TYPE_WHITE:
 					calibColorValues[0] = dps.readColorValue();
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "value white: {}",calibColorValues[0]);
+					spdlog::get("file_logger")->debug("value white: {}",calibColorValues[0]);
 
 					std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 					calibColor=ft::TxtWPType_t::WP_TYPE_RED;
@@ -680,6 +682,7 @@ void TxtVacuumGripperRobot::fsmStep()
 				case ft::TxtWPType_t::WP_TYPE_RED:
 					calibColorValues[1] = dps.readColorValue();
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "value red: {}",calibColorValues[1]);
+					spdlog::get("file_logger")->debug("value red: {}",calibColorValues[1]);
 
 					std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 					calibColor=ft::TxtWPType_t::WP_TYPE_BLUE;
@@ -688,8 +691,11 @@ void TxtVacuumGripperRobot::fsmStep()
 				case ft::TxtWPType_t::WP_TYPE_BLUE:
 					calibColorValues[2] = dps.readColorValue();
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "value blue: {}",calibColorValues[2]);
+					spdlog::get("file_logger")->debug("value blue: {}",calibColorValues[2]);
 
 					SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "w:{} r:{} b:{}",calibColorValues[0],calibColorValues[1],calibColorValues[2]);
+					spdlog::get("file_logger")->debug("w:{} r:{} b:{}",calibColorValues[0],calibColorValues[1],calibColorValues[2]);
+					
 					if ((calibColorValues[0] > 0)&&
 						(calibColorValues[1] > 0)&&
 						(calibColorValues[2] > 0))
@@ -697,6 +703,7 @@ void TxtVacuumGripperRobot::fsmStep()
 						dps.calibData.color_th[0] = (calibColorValues[0] + calibColorValues[1]) / 2;
 						dps.calibData.color_th[1] = (calibColorValues[1] + calibColorValues[2]) / 2;
 						SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "th1:{} th2:{}",dps.calibData.color_th[0],dps.calibData.color_th[1]);
+						spdlog::get("file_logger")->debug("th1:{} th2:{}",dps.calibData.color_th[0],dps.calibData.color_th[1]);
 
 						//check
 						if ((calibColorValues[0] < calibColorValues[1])&&

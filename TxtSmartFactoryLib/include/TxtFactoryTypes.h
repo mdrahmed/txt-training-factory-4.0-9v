@@ -96,6 +96,7 @@ public:
 
 	void printDebug() {
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "WP uid:{} type:{} state:{}",tag_uid,toString(type), toString(state));
+		spdlog::get("file_logger")->debug("WP uid:{} type:{} state:{}",tag_uid,toString(type), toString(state));
 	}
 
 	std::string tag_uid;
