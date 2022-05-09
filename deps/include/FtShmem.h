@@ -630,6 +630,9 @@ typedef struct _TXT_SPECIAL_OUTPUTS
 // ============================================================================
 //  transferarea of ROBO TX Controller
 //-----------------------------------------------------------------------------
+
+//#define RESERVE_SIZE 1024
+
 #define RESERVE_SIZE \
     (1024 - ( \
     sizeof(FTX1_SHMIFINFO)  + \

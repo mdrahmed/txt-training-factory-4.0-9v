@@ -43,10 +43,12 @@ void TxtVacuumGripperRobot::fsmStep()
 	SPDLOG_LOGGER_TRACE(spdlog::get("console"), "fsmStep",0);
 	spdlog::get("file_logger")->trace("fsmStep",0);
 
+	spdlog::get("file_logger")->info("newState: {}",newState);
 	// Entry activities ===================================================
 	if( newState != currentState )
 	{
 		//update order view (only if state changed)
+
 		if (reqOrder)
 		{
 			ord_state.type = reqWP_order.type;
@@ -101,6 +103,7 @@ void TxtVacuumGripperRobot::fsmStep()
 		}
 		currentState = newState;
 	}
+	spdlog::get("file_logger")->info("currentState: {}",currentState);
 
 	// Do activities ==================================================
 	switch( currentState )
@@ -128,6 +131,7 @@ void TxtVacuumGripperRobot::fsmStep()
 		FSM_TRANSITION( INIT, color=blue, label='wait' );
 #endif
 		printState(INIT);
+		spdlog::get("file_logger")->info("INIT: {}, triggered by run",INIT);
 		moveRef();
 		FSM_TRANSITION( IDLE, color=green, label='initialized' );
 		break;
@@ -136,6 +140,7 @@ void TxtVacuumGripperRobot::fsmStep()
 	case IDLE:
 	{
 		//printState(IDLE);
+		spdlog::get("file_logger")->info("IDLE: {}, triggered by ",IDLE);
 
 		//NFC requests
 		if (reqNfcDelete)
@@ -192,6 +197,7 @@ void TxtVacuumGripperRobot::fsmStep()
 		}
 		else if (!dps.is_DIN())
 		{
+			spdlog::get("file_logger")->info("is_DIN: {}, triggered by IDLE",dps.is_DIN());
 			FSM_TRANSITION( START_DELIVERY, color=blue, label='dsi' );
 		}
 		/*else if (joyData.aY2 < -500)
@@ -353,7 +359,8 @@ void TxtVacuumGripperRobot::fsmStep()
 	case START_DELIVERY:
 	{
 		printState(START_DELIVERY);
-		spdlog::get("file_logger")->info("START_DELIVERY to HBW: ", START_DELIVERY);
+		// spdlog::get("file_logger")->info("START_DELIVERY to HBW: {}", START_DELIVERY);
+		spdlog::get("file_logger")->info("START_DELIVERY:{} triggered by is_DIN",START_DELIVERY);
 		setTarget("hbw");
 		moveDeliveryInAndGrip();
 		moveNFC();
@@ -382,6 +389,7 @@ void TxtVacuumGripperRobot::fsmStep()
 	case COLOR_DETECTION:
 	{
 		printState(COLOR_DETECTION);
+		spdlog::get("file_logger")->info("COLOR_DETECTION:{} triggered by START_DELIVERY",COLOR_DETECTION);
 		moveColorSensor();
 		dps.readColorValue();
 		assert(reqWP_HBW);
@@ -408,6 +416,7 @@ void TxtVacuumGripperRobot::fsmStep()
 	case NFC_RAW:
 	{
 		printState(NFC_RAW);
+		spdlog::get("file_logger")->info("NFC_RAW:{} triggered by COLOR_DETECTION",NFC_RAW);
 		moveNFC();
 		std::string uid = dps.nfcReadUID();
 		if (uid.empty())
@@ -530,6 +539,7 @@ void TxtVacuumGripperRobot::fsmStep()
 	case STORE_WP_VGR:
 	{
 		printState(STORE_WP_VGR);
+		spdlog::get("file_logger")->info("STORE_WP_VGR:{} triggered by NFC_RAW",STORE_WP_VGR);
 
 		assert(mqttclient);
 		mqttclient->publishVGR_Do(VGR_HBW_FETCHCONTAINER, reqWP_HBW, TIMEOUT_MS_PUBLISH);
@@ -554,6 +564,7 @@ void TxtVacuumGripperRobot::fsmStep()
 	case STORE_WP:
 	{
 		printState(STORE_WP);
+		spdlog::get("file_logger")->info("STORE_WP:{} triggered by STORE_WP_VGR",STORE_WP);
 
 		if (reqHBWfetched)
 		{

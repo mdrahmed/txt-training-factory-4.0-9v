@@ -85,7 +85,7 @@ class callback : public virtual mqtt::callback
 	void message_arrived(mqtt::const_message_ptr msg) override {
 		assert(msg);
 		SPDLOG_LOGGER_DEBUG(spdlog::get("console"), "message_arrived  message:{} payload:{}", msg->get_topic(), msg->to_string());
-		spdlog::get("file_logger")->debug("message_arrived  message:{} payload:{}", msg->get_topic(), msg->to_string());
+		spdlog::get("file_logger")->debug("message_arrived  message:{} payload:{} triggered by STORE_WP of TxtFactoryVGR", msg->get_topic(), msg->to_string());
 		//BUGFIX: msg->get_topic() is empty
 		//FIX paho.mqtt.cpp: https://github.com/eclipse/paho.mqtt.c/issues/440#issuecomment-380161713
 
@@ -779,6 +779,9 @@ public:
 
 int main(int argc, char* argv[])
 {
+	// getting the value of the reserve size
+	printf("reserved size: %d",RESERVE_SIZE);
+	
 	std::string clientName;
 #ifdef CLIENT_MPO
 	clientName = "TxtFactoryMPO";

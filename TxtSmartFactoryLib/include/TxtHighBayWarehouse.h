@@ -144,7 +144,7 @@ public:
 	}
 	void requestVGRfetchContainer(TxtWorkpiece* wp) {
 		SPDLOG_LOGGER_TRACE(spdlog::get("console"),"reqVGRfetchContainer",0);
-		spdlog::get("file_logger")->trace("reqVGRfetchContainer",0);
+		spdlog::get("file_logger")->trace("reqVGRfetchContainer - triggered by message_arrived",0);
 		reqVGRwp = wp;
 		reqVGRfetchContainer= true;
 	}
